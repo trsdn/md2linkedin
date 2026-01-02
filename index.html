@@ -68,7 +68,7 @@
     }
 
     @media (min-width: 980px) {
-      .wrap { grid-template-columns: 1fr 1fr; }
+      .wrap { grid-template-columns: repeat(3, minmax(260px, 1fr)); }
     }
 
     .card {
@@ -215,23 +215,6 @@
     .tab.active {
       color: var(--text);
       background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 32%, transparent), color-mix(in srgb, var(--accent2) 16%, transparent));
-    }
-
-    .previewWrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 18px 36px;
-    }
-
-    .previewGrid {
-      display: grid;
-      gap: 14px;
-      grid-template-columns: 1fr;
-      align-items: start;
-    }
-
-    @media (min-width: 980px) {
-      .previewGrid { grid-template-columns: 1fr 1fr; }
     }
 
     .liCard {
@@ -446,38 +429,33 @@
         </div>
       </div>
     </section>
-  </main>
 
-  <section class="previewWrap">
-    <div class="previewGrid">
-      <div class="card">
-        <header style="display:flex; align-items:center; justify-content: space-between; gap: 10px;">
-          <h2 style="margin:0; font-size:14px; letter-spacing: 0.3px; text-transform: uppercase; color: var(--muted);">LinkedIn preview</h2>
-          <div class="tabs" role="tablist" aria-label="Preview device">
-            <button class="tab active" id="tabDesktop" role="tab" aria-selected="true" type="button">Desktop</button>
-            <button class="tab" id="tabMobile" role="tab" aria-selected="false" type="button">Mobile</button>
-          </div>
-        </header>
-        <div style="padding: 14px;">
-          <div class="liCard" id="liCard">
-            <div class="liTop">
-              <div class="avatar" aria-hidden="true"></div>
-              <div class="liMeta">
-                <div class="liName">You · Your Name</div>
-                <div class="liTitle">Your Title · Now</div>
-                <div class="liTime" id="liMetaLine">Public • ✦</div>
-              </div>
+    <section class="card">
+      <header style="display:flex; align-items:center; justify-content: space-between; gap: 10px;">
+        <h2 style="margin:0; font-size:14px; letter-spacing: 0.3px; text-transform: uppercase; color: var(--muted);">LinkedIn preview</h2>
+        <div class="tabs" role="tablist" aria-label="Preview device">
+          <button class="tab active" id="tabDesktop" role="tab" aria-selected="true" type="button">Desktop</button>
+          <button class="tab" id="tabMobile" role="tab" aria-selected="false" type="button">Mobile</button>
+        </div>
+      </header>
+      <div style="padding: 14px;">
+        <div class="liCard" id="liCard">
+          <div class="liTop">
+            <div class="avatar" aria-hidden="true"></div>
+            <div class="liMeta">
+              <div class="liName">You · Your Name</div>
+              <div class="liTitle">Your Title · Now</div>
+              <div class="liTime" id="liMetaLine">Public • ✦</div>
             </div>
-            <div class="liBody" id="liBody"></div>
           </div>
-          <div class="hint" style="margin-top:10px;">
-            This is a visual mock. LinkedIn may render line breaks and Unicode slightly differently.
-          </div>
+          <div class="liBody" id="liBody"></div>
+        </div>
+        <div class="hint" style="margin-top:10px;">
+          This is a visual mock. LinkedIn may render line breaks and Unicode slightly differently.
         </div>
       </div>
-
-    </div>
-  </section>
+    </section>
+  </main>
 
   <div class="footer">
     <p>
