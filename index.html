@@ -401,6 +401,11 @@
     <section class="card">
       <header><h2>Markdown input</h2></header>
       <textarea id="md" spellcheck="false" placeholder="# Headline\n\nWrite **bold**, *italic*, ***both***, `code`, ~~strike~~.\n\n- Bullet 1\n- Bullet 2\n\n[My site](https://example.com)"></textarea>
+      <div class="hint" style="padding: 0 14px 12px;">
+        <div style="margin-bottom: 6px;"><strong style="color: var(--text);">Paste from Word / Google Docs:</strong> if your clipboard contains rich text, this tool will try to convert it into Markdown automatically.</div>
+        <div style="margin-bottom: 6px;"><strong style="color: var(--text);">Tables:</strong> pipe tables are converted to readable aligned text.</div>
+        <div><strong style="color: var(--text);">Code blocks:</strong> fenced blocks (<span class="mono">```</span>) are supported and rendered as monospace Unicode.</div>
+      </div>
       <div class="toolbar">
         <div class="left">
           <button id="btnConvert" class="primary" title="Convert now (useful when Auto is off)">Convert</button>
@@ -471,14 +476,6 @@
         </div>
       </div>
 
-      <div class="card">
-        <header><h2>Tips (no backend)</h2></header>
-        <div style="padding:14px;" class="hint">
-          <div style="margin-bottom: 10px;"><strong style="color: var(--text);">Paste from Word / Google Docs:</strong> if your clipboard contains rich text, this tool will try to convert it into Markdown automatically.</div>
-          <div style="margin-bottom: 10px;"><strong style="color: var(--text);">Tables:</strong> pipe tables are converted to readable aligned text.</div>
-          <div><strong style="color: var(--text);">Code blocks:</strong> fenced blocks (<span class="mono">```</span>) are supported and rendered as monospace Unicode.</div>
-        </div>
-      </div>
     </div>
   </section>
 
