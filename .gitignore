@@ -1,0 +1,14 @@
+.DS_Store
+
+# Editor / tooling
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Playwright/codegen artifacts (keep repo clean)
+playwright/
+
+# Temporary
+*.tmp

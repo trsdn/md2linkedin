@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MD → LinkedIn Unicode Formatter</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f1a2e;
+      --text: #e8eefc;
+      --muted: #a8b3cf;
+      --border: rgba(232, 238, 252, 0.14);
+      --accent: #7aa2ff;
+      --accent2: #5ef0c2;
+      --danger: #ff6b6b;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f6f7fb;
+        --panel: #ffffff;
+        --text: #0b1220;
+        --muted: #4c566a;
+        --border: rgba(11, 18, 32, 0.14);
+        --accent: #2f62ff;
+        --accent2: #0bbf8a;
+        --danger: #d64545;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1000px 700px at 20% 10%, rgba(122, 162, 255, 0.22), transparent 60%),
+                  radial-gradient(900px 650px at 90% 20%, rgba(94, 240, 194, 0.18), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      max-width: 1100px;
+      margin: 28px auto 10px;
+      padding: 0 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      letter-spacing: 0.2px;
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 18px auto 36px;
+      padding: 0 18px;
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 980px) {
+      .wrap { grid-template-columns: 1fr 1fr; }
+    }
+
+    .card {
+      background: color-mix(in srgb, var(--panel) 92%, transparent);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.16);
+      backdrop-filter: blur(10px);
+    }
+
+    .card header {
+      margin: 0;
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--border);
+      max-width: unset;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 380px;
+      resize: vertical;
+      border: 0;
+      outline: none;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+      background: transparent;
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .toolbar .left,
+    .toolbar .right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel) 88%, transparent);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.05s ease, border-color 0.15s ease, background 0.15s ease;
+      user-select: none;
+    }
+
+    button:hover { border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); }
+    button:active { transform: translateY(1px); }
+
+    .primary {
+      border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 42%, transparent), color-mix(in srgb, var(--accent2) 20%, transparent));
+    }
+
+    .danger {
+      border-color: color-mix(in srgb, var(--danger) 50%, var(--border));
+      color: color-mix(in srgb, var(--danger) 80%, var(--text));
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .row {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 18px 26px;
+    }
+
+    .pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel) 84%, transparent);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      color: color-mix(in srgb, var(--accent2) 65%, var(--text));
+    }
+
+    .status {
+      font-size: 12px;
+      color: var(--muted);
+      min-height: 16px;
+    }
+
+    .status strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .footer {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 18px 34px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MD → LinkedIn Unicode Formatter</h1>
+    <p class="sub">
+      Paste Markdown on the left. Get “LinkedIn-style” bold/italic/mono on the right using Unicode letter variants.
+      This is plain text output (no HTML), so you can paste it into LinkedIn.
+    </p>
+  </header>
+
+  <div class="row">
+    <div class="pill">
+      Supports: <span class="mono">**bold**</span>, <span class="mono">*italic*</span>, <span class="mono">***bolditalic***</span>,
+      <span class="mono">`code`</span>, <span class="mono">~~strike~~</span>, headings, bullets, and <span class="mono">[text](url)</span>.
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section class="card">
+      <header><h2>Markdown input</h2></header>
+      <textarea id="md" spellcheck="false" placeholder="# Headline\n\nWrite **bold**, *italic*, ***both***, `code`, ~~strike~~.\n\n- Bullet 1\n- Bullet 2\n\n[My site](https://example.com)"></textarea>
+      <div class="toolbar">
+        <div class="left">
+          <button id="btnExample">Insert example</button>
+          <button id="btnClear" class="danger">Clear</button>
+        </div>
+        <div class="right">
+          <span class="hint">Converts as you type.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <header><h2>LinkedIn-ready output</h2></header>
+      <textarea id="out" spellcheck="false" readonly placeholder="Your formatted text will appear here..."></textarea>
+      <div class="toolbar">
+        <div class="left">
+          <button id="btnCopy" class="primary">Copy</button>
+          <button id="btnSelect">Select all</button>
+        </div>
+        <div class="right">
+          <div class="status" id="status"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer">
+    <p>
+      Notes: Unicode “font” letters may look different across devices, and some characters (especially emojis or non‑Latin scripts) are left unchanged.
+      If LinkedIn ever changes how it treats certain Unicode ranges, results may vary.
+    </p>
+  </div>
+
+  <script>
+    // --- Unicode mapping helpers ---
+
+    const STYLE = {
+      BOLD: 'bold',
+      ITALIC: 'italic',
+      BOLD_ITALIC: 'boldItalic',
+      MONO: 'mono',
+    };
+
+    // Mathematical Alphanumeric Symbols blocks.
+    // Use fromCodePoint to handle astral plane characters correctly.
+    const RANGES = {
+      [STYLE.BOLD]: {
+        upper: 0x1D400,
+        lower: 0x1D41A,
+        digit: 0x1D7CE,
+      },
+      [STYLE.ITALIC]: {
+        upper: 0x1D434,
+        lower: 0x1D44E,
+        digit: null, // no dedicated italic digits
+      },
+      [STYLE.BOLD_ITALIC]: {
+        upper: 0x1D468,
+        lower: 0x1D482,
+        digit: null, // no dedicated bold-italic digits
+      },
+      [STYLE.MONO]: {
+        upper: 0x1D670,
+        lower: 0x1D68A,
+        digit: 0x1D7F6,
+      },
+    };
+
+    // Known italic lowercase exceptions in Unicode mathematical alphabets.
+    // The italic small 'h' is U+210E (PLANCK CONSTANT) instead of U+1D455.
+    const ITALIC_EXCEPTIONS = {
+      'h': '\u210E', // ℎ
+    };
+
+    function mapChar(style, ch) {
+      const r = RANGES[style];
+      if (!r) return ch;
+
+      if (style === STYLE.ITALIC && ITALIC_EXCEPTIONS[ch]) {
+        return ITALIC_EXCEPTIONS[ch];
+      }
+
+      const code = ch.codePointAt(0);
+      // A-Z
+      if (code >= 0x41 && code <= 0x5A) {
+        return String.fromCodePoint(r.upper + (code - 0x41));
+      }
+      // a-z
+      if (code >= 0x61 && code <= 0x7A) {
+        return String.fromCodePoint(r.lower + (code - 0x61));
+      }
+      // 0-9
+      if (code >= 0x30 && code <= 0x39 && r.digit != null) {
+        return String.fromCodePoint(r.digit + (code - 0x30));
+      }
+
+      return ch;
+    }
+
+    function stylize(style, text) {
+      // Spread iterates code points (handles surrogate pairs).
+      return Array.from(text).map(ch => mapChar(style, ch)).join('');
+    }
+
+    function strike(text) {
+      // Combine LONG STROKE OVERLAY (U+0336) after each character.
+      // Skip newlines; keep spaces unstruck to look less noisy.
+      const overlay = '\u0336';
+      let out = '';
+      for (const ch of Array.from(text)) {
+        if (ch === '\n' || ch === '\r') {
+          out += ch;
+          continue;
+        }
+        if (ch === ' ' || ch === '\t') {
+          out += ch;
+          continue;
+        }
+        out += ch + overlay;
+      }
+      return out;
+    }
+
+    // --- Markdown-ish conversion (intentionally simple) ---
+
+    function normalizeLines(md) {
+      const lines = md.replace(/\r\n/g, '\n').split('\n');
+      const out = [];
+
+      for (const line of lines) {
+        // Headings: #, ##, ### -> bold line content
+        const heading = line.match(/^\s{0,3}(#{1,6})\s+(.*)$/);
+        if (heading) {
+          out.push('**' + heading[2].trim() + '**');
+          continue;
+        }
+
+        // Bullets: -, *, + (space) -> convert to "• "
+        const bullet = line.match(/^\s{0,3}([-*+])\s+(.*)$/);
+        if (bullet) {
+          out.push('• ' + bullet[2]);
+          continue;
+        }
+
+        // Numbered list: "1. " -> keep as-is
+        out.push(line);
+      }
+
+      return out.join('\n');
+    }
+
+    function convertLinks(md) {
+      // [text](url) => text (url)
+      return md.replace(/\[([^\]]+?)\]\(([^\s)]+(?:\s+\"[^\"]*\")?)\)/g, (m, text, urlPart) => {
+        // Strip optional title if present after URL
+        const url = String(urlPart).split(/\s+\"/)[0];
+        return `${text} (${url})`;
+      });
+    }
+
+    function protectCodeSpans(md) {
+      // Replace `code` spans with tokens so emphasis parsing won't touch them.
+      const tokens = [];
+      const out = md.replace(/`([^`\n]+?)`/g, (m, code) => {
+        const id = tokens.length;
+        tokens.push(code);
+        return `\uE000CODE${id}\uE000`;
+      });
+      return { out, tokens };
+    }
+
+    function restoreCodeSpans(text, tokens) {
+      return text.replace(/\uE000CODE(\d+)\uE000/g, (m, id) => {
+        const code = tokens[Number(id)] ?? '';
+        return stylize(STYLE.MONO, code);
+      });
+    }
+
+    function applyEmphasis(md) {
+      // Order matters.
+      let s = md;
+
+      // Bold+Italic: ***text*** or ___text___
+      s = s.replace(/\*\*\*([\s\S]+?)\*\*\*/g, (m, inner) => stylize(STYLE.BOLD_ITALIC, inner));
+      s = s.replace(/___([\s\S]+?)___/g, (m, inner) => stylize(STYLE.BOLD_ITALIC, inner));
+
+      // Bold: **text** or __text__
+      s = s.replace(/\*\*([\s\S]+?)\*\*/g, (m, inner) => stylize(STYLE.BOLD, inner));
+      s = s.replace(/__([\s\S]+?)__/g, (m, inner) => stylize(STYLE.BOLD, inner));
+
+      // Italic: *text* or _text_
+      // Keep it conservative to avoid eating bullet markers; require non-space at start/end.
+      s = s.replace(/(^|[^*])\*([^\s][\s\S]*?[^\s])\*(?!\*)/g, (m, pre, inner) => pre + stylize(STYLE.ITALIC, inner));
+      s = s.replace(/(^|[^_])_([^\s][\s\S]*?[^\s])_(?!_)/g, (m, pre, inner) => pre + stylize(STYLE.ITALIC, inner));
+
+      return s;
+    }
+
+    function applyStrike(md) {
+      return md.replace(/~~([\s\S]+?)~~/g, (m, inner) => strike(inner));
+    }
+
+    function cleanup(md) {
+      // Remove any remaining markdown markers that we didn't convert.
+      // (We keep things conservative so we don't accidentally remove intended characters.)
+      return md;
+    }
+
+    function mdToLinkedInUnicode(md) {
+      let s = normalizeLines(md);
+      s = convertLinks(s);
+
+      const protectedCode = protectCodeSpans(s);
+      s = protectedCode.out;
+
+      s = applyStrike(s);
+      s = applyEmphasis(s);
+
+      s = restoreCodeSpans(s, protectedCode.tokens);
+      s = cleanup(s);
+
+      return s;
+    }
+
+    // --- UI wiring ---
+
+    const elMd = document.getElementById('md');
+    const elOut = document.getElementById('out');
+    const elStatus = document.getElementById('status');
+
+    const btnCopy = document.getElementById('btnCopy');
+    const btnSelect = document.getElementById('btnSelect');
+    const btnClear = document.getElementById('btnClear');
+    const btnExample = document.getElementById('btnExample');
+
+    const EXAMPLE = `# Launching something new\n\nHey everyone — I’m excited to share: **MD → LinkedIn formatter**.\n\nUse *italic* for emphasis, **bold** for punch, and ***both*** for drama.\n\nCode-y bits: \`npm run build\`\n\n- Fast\n- Simple\n- Copy/paste friendly\n\n~~This line is struck~~ but we move on.\n\n[My site](https://example.com)`;
+
+    function setStatus(html) {
+      elStatus.innerHTML = html;
+    }
+
+    function convertNow() {
+      const input = elMd.value ?? '';
+      const output = mdToLinkedInUnicode(input);
+      elOut.value = output;
+      setStatus(`Characters: <strong>${output.length}</strong>`);
+    }
+
+    async function copyOutput() {
+      const text = elOut.value;
+      if (!text) {
+        setStatus('Nothing to copy.');
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        setStatus('Copied to clipboard.');
+      } catch {
+        // Fallback
+        elOut.focus();
+        elOut.select();
+        try {
+          document.execCommand('copy');
+          setStatus('Copied (fallback).');
+        } catch {
+          setStatus('Copy failed — select the text and copy manually.');
+        }
+      }
+    }
+
+    elMd.addEventListener('input', convertNow);
+
+    btnCopy.addEventListener('click', copyOutput);
+
+    btnSelect.addEventListener('click', () => {
+      elOut.focus();
+      elOut.select();
+      setStatus('Selected output.');
+    });
+
+    btnClear.addEventListener('click', () => {
+      elMd.value = '';
+      convertNow();
+      elMd.focus();
+      setStatus('Cleared.');
+    });
+
+    btnExample.addEventListener('click', () => {
+      elMd.value = EXAMPLE;
+      convertNow();
+      elMd.focus();
+      setStatus('Example inserted.');
+    });
+
+    // Initial conversion
+    convertNow();
+  </script>
+</body>
+</html>
