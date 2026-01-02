@@ -109,6 +109,77 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
 
+    .editorBar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel) 92%, transparent);
+    }
+
+    .editorBar .group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .iconBtn {
+      width: 36px;
+      height: 34px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text);
+    }
+
+    .iconBtn:hover {
+      border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+      background: color-mix(in srgb, var(--panel) 80%, transparent);
+    }
+
+    .iconBtn:active { transform: translateY(1px); }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.92;
+    }
+
+    .sep {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+      margin: 0 6px;
+    }
+
+    .countBadge {
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel) 88%, transparent);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .countBadge strong {
+      color: var(--text);
+      font-weight: 650;
+    }
+
     .toolbar {
       display: flex;
       gap: 10px;
@@ -286,6 +357,41 @@
   <main class="wrap">
     <section class="card">
       <header><h2>Markdown input</h2></header>
+      <div class="editorBar" aria-label="Editor toolbar">
+        <div class="group" role="toolbar" aria-label="Formatting">
+          <button class="iconBtn" id="tbBold" type="button" title="Bold (wrap with **)"><span style="font-weight:800; font-size:15px; letter-spacing:0.2px;">B</span></button>
+          <button class="iconBtn" id="tbItalic" type="button" title="Italic (wrap with *)"><span style="font-style:italic; font-size:15px;">I</span></button>
+          <button class="iconBtn" id="tbStrike" type="button" title="Strikethrough (wrap with ~~)"><span style="text-decoration: line-through; font-size:15px;">S</span></button>
+          <button class="iconBtn" id="tbLink" type="button" title="Link ([text](url))" aria-label="Insert link">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 0 0-7.07-7.07L11 2.86"/><path d="M14 11a5 5 0 0 0-7.07 0L4.81 13.1a5 5 0 0 0 7.07 7.07L13 21.14"/></svg>
+          </button>
+
+          <span class="sep" aria-hidden="true"></span>
+
+          <button class="iconBtn" id="tbBullets" type="button" title="Bulleted list" aria-label="Bulleted list">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M4 6h.01"/><path d="M4 12h.01"/><path d="M4 18h.01"/></svg>
+          </button>
+          <button class="iconBtn" id="tbNumbered" type="button" title="Numbered list" aria-label="Numbered list">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h12"/><path d="M9 12h12"/><path d="M9 18h12"/><path d="M4 6h1"/><path d="M4 12h1"/><path d="M4 18h1"/></svg>
+          </button>
+          <button class="iconBtn" id="tbQuote" type="button" title="Quote (prefix > )" aria-label="Blockquote">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h4v5H8.5A2.5 2.5 0 0 0 6 14.5V17"/><path d="M17 7h4v5h-2.5A2.5 2.5 0 0 0 16 14.5V17"/></svg>
+          </button>
+          <button class="iconBtn" id="tbCode" type="button" title="Code (inline/backticks or fenced)" aria-label="Code">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 9 4 12l4 3"/><path d="M16 9l4 3-4 3"/><path d="M14 6 10 18"/></svg>
+          </button>
+
+          <span class="sep" aria-hidden="true"></span>
+
+          <button class="iconBtn" id="tbUndo" type="button" title="Undo" aria-label="Undo">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-4"/></svg>
+          </button>
+          <button class="iconBtn" id="tbRedo" type="button" title="Redo" aria-label="Redo">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h4"/></svg>
+          </button>
+        </div>
+        <div class="countBadge" id="mdCount" aria-label="Markdown character count"><strong>0</strong> characters</div>
+      </div>
       <textarea id="md" spellcheck="false" placeholder="# Headline\n\nWrite **bold**, *italic*, ***both***, `code`, ~~strike~~.\n\n- Bullet 1\n- Bullet 2\n\n[My site](https://example.com)"></textarea>
       <div class="hint" style="padding: 0 14px 12px;">
         <div style="margin-bottom: 6px;"><strong style="color: var(--text);">Paste from Word / Google Docs:</strong> if your clipboard contains rich text, this tool will try to convert it into Markdown automatically.</div>
@@ -684,6 +790,7 @@
     const elMd = document.getElementById('md');
     const elOut = document.getElementById('out');
     const elStatus = document.getElementById('status');
+    const elMdCount = document.getElementById('mdCount');
 
     const btnCopy = document.getElementById('btnCopy');
     const btnSelect = document.getElementById('btnSelect');
@@ -697,10 +804,27 @@
     const btnCloseGuide = document.getElementById('btnCloseGuide');
     const bulletStyle = document.getElementById('bulletStyle');
 
+    const tbBold = document.getElementById('tbBold');
+    const tbItalic = document.getElementById('tbItalic');
+    const tbStrike = document.getElementById('tbStrike');
+    const tbLink = document.getElementById('tbLink');
+    const tbBullets = document.getElementById('tbBullets');
+    const tbNumbered = document.getElementById('tbNumbered');
+    const tbQuote = document.getElementById('tbQuote');
+    const tbCode = document.getElementById('tbCode');
+    const tbUndo = document.getElementById('tbUndo');
+    const tbRedo = document.getElementById('tbRedo');
+
     const EXAMPLE = `# Launching something new\n\nHey everyone — I’m excited to share: **MD → LinkedIn formatter**.\n\nUse *italic* for emphasis, **bold** for punch, and ***both*** for drama.\n\nCode-y bits: \`npm run build\`\n\n- Fast\n- Simple\n- Copy/paste friendly\n\n~~This line is struck~~ but we move on.\n\n[My site](https://example.com)`;
 
     function setStatus(html) {
       elStatus.innerHTML = html;
+    }
+
+    function updateMdCount() {
+      if (!elMdCount) return;
+      const len = (elMd?.value ?? '').length;
+      elMdCount.innerHTML = `<strong>${len}</strong> characters`;
     }
 
     const LIMIT_POST = 3000;
@@ -738,6 +862,102 @@
       const output = mdToLinkedInUnicode(input, getOpts());
       elOut.value = output;
       renderStatus(output);
+    }
+
+    function replaceSelection(textarea, replacement, selectFrom, selectTo) {
+      const start = textarea.selectionStart ?? 0;
+      const end = textarea.selectionEnd ?? start;
+      textarea.setRangeText(replacement, start, end, 'end');
+      if (typeof selectFrom === 'number' && typeof selectTo === 'number') {
+        textarea.setSelectionRange(selectFrom, selectTo);
+      }
+    }
+
+    function wrapSelection(textarea, before, after, placeholder) {
+      const start = textarea.selectionStart ?? 0;
+      const end = textarea.selectionEnd ?? start;
+      const selected = textarea.value.slice(start, end);
+      const inner = selected || (placeholder ?? 'text');
+      const replacement = before + inner + after;
+      replaceSelection(textarea, replacement);
+
+      // If we inserted placeholder (no prior selection), select it for easy overwrite.
+      if (!selected && placeholder != null) {
+        const selStart = start + before.length;
+        const selEnd = selStart + inner.length;
+        textarea.setSelectionRange(selStart, selEnd);
+      }
+    }
+
+    function prefixLines(textarea, prefix, numbered) {
+      const start = textarea.selectionStart ?? 0;
+      const end = textarea.selectionEnd ?? start;
+      const value = textarea.value;
+
+      const lineStart = value.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
+      const lineEndIdx = value.indexOf('\n', end);
+      const lineEnd = lineEndIdx === -1 ? value.length : lineEndIdx;
+      const block = value.slice(lineStart, lineEnd);
+
+      const lines = block.split('\n');
+      const out = lines.map((ln, i) => {
+        if (ln.trim() === '') return ln;
+        if (numbered) return `${i + 1}. ${ln.replace(/^\s+/, '')}`;
+        return `${prefix}${ln.replace(/^\s+/, '')}`;
+      }).join('\n');
+
+      textarea.setSelectionRange(lineStart, lineEnd);
+      replaceSelection(textarea, out);
+      textarea.setSelectionRange(lineStart, lineStart + out.length);
+    }
+
+    function insertCode(textarea) {
+      const start = textarea.selectionStart ?? 0;
+      const end = textarea.selectionEnd ?? start;
+      const selected = textarea.value.slice(start, end);
+      const hasNewline = selected.includes('\n');
+      if (hasNewline) {
+        const inner = selected || 'code';
+        const replacement = `\n\n\
+\`\`\`\n${inner.replace(/\n+$/g, '')}\n\`\`\`\n\n`;
+        replaceSelection(textarea, replacement);
+      } else {
+        wrapSelection(textarea, '`', '`', 'code');
+      }
+    }
+
+    function insertLinkAtSelection(textarea) {
+      const start = textarea.selectionStart ?? 0;
+      const end = textarea.selectionEnd ?? start;
+      const selected = textarea.value.slice(start, end).trim();
+
+      const looksLikeUrl = /^https?:\/\//i.test(selected) && !/\s/.test(selected);
+      const text = looksLikeUrl ? 'link text' : (selected || 'link text');
+      const url = looksLikeUrl ? selected : 'https://example.com';
+
+      const replacement = `[${text}](${url})`;
+      replaceSelection(textarea, replacement);
+
+      // Select the most likely field the user wants to edit.
+      if (looksLikeUrl) {
+        const selStart = start + 1;
+        const selEnd = selStart + text.length;
+        textarea.setSelectionRange(selStart, selEnd);
+      } else {
+        const urlStart = start + replacement.lastIndexOf('(') + 1;
+        const urlEnd = urlStart + url.length;
+        textarea.setSelectionRange(urlStart, urlEnd);
+      }
+    }
+
+    function doUndoRedo(kind) {
+      elMd.focus();
+      try {
+        // Deprecated but still widely supported for textarea undo/redo.
+        document.execCommand(kind);
+      } catch {
+        // No-op: browser doesn't allow programmatic undo/redo.
+      }
     }
 
     function downloadOutput() {
@@ -787,6 +1007,76 @@
     }
 
     elMd.addEventListener('input', () => {
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    // Toolbar actions
+    tbBold?.addEventListener('click', () => {
+      elMd.focus();
+      wrapSelection(elMd, '**', '**', 'bold');
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbItalic?.addEventListener('click', () => {
+      elMd.focus();
+      wrapSelection(elMd, '*', '*', 'italic');
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbStrike?.addEventListener('click', () => {
+      elMd.focus();
+      wrapSelection(elMd, '~~', '~~', 'strike');
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbLink?.addEventListener('click', () => {
+      elMd.focus();
+      insertLinkAtSelection(elMd);
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbBullets?.addEventListener('click', () => {
+      elMd.focus();
+      prefixLines(elMd, '- ', false);
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbNumbered?.addEventListener('click', () => {
+      elMd.focus();
+      prefixLines(elMd, '', true);
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbQuote?.addEventListener('click', () => {
+      elMd.focus();
+      prefixLines(elMd, '> ', false);
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbCode?.addEventListener('click', () => {
+      elMd.focus();
+      insertCode(elMd);
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbUndo?.addEventListener('click', () => {
+      doUndoRedo('undo');
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbRedo?.addEventListener('click', () => {
+      doUndoRedo('redo');
+      updateMdCount();
       if (isAuto()) convertNow();
     });
 
@@ -991,6 +1281,7 @@
     btnClear.addEventListener('click', () => {
       elMd.value = '';
       convertNow();
+      updateMdCount();
       elMd.focus();
       setStatus('Cleared.');
     });
@@ -998,12 +1289,14 @@
     btnExample.addEventListener('click', () => {
       elMd.value = EXAMPLE;
       convertNow();
+      updateMdCount();
       elMd.focus();
       setStatus('Example inserted.');
     });
 
     // Initial conversion
     convertNow();
+    updateMdCount();
   </script>
 </body>
 </html>
