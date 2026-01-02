@@ -229,11 +229,15 @@
       <textarea id="md" spellcheck="false" placeholder="# Headline\n\nWrite **bold**, *italic*, ***both***, `code`, ~~strike~~.\n\n- Bullet 1\n- Bullet 2\n\n[My site](https://example.com)"></textarea>
       <div class="toolbar">
         <div class="left">
+          <button id="btnConvert" class="primary" title="Convert now (useful when Auto is off)">Convert</button>
           <button id="btnExample">Insert example</button>
           <button id="btnClear" class="danger">Clear</button>
         </div>
         <div class="right">
-          <span class="hint">Converts as you type.</span>
+          <label class="pill" style="padding: 7px 10px; gap: 10px;">
+            <span>Auto</span>
+            <input id="toggleAuto" type="checkbox" checked aria-label="Auto convert" />
+          </label>
         </div>
       </div>
     </section>
@@ -245,6 +249,7 @@
         <div class="left">
           <button id="btnCopy" class="primary">Copy</button>
           <button id="btnSelect">Select all</button>
+          <button id="btnDownload">Download .txt</button>
         </div>
         <div class="right">
           <div class="status" id="status"></div>
@@ -461,6 +466,9 @@
     const btnSelect = document.getElementById('btnSelect');
     const btnClear = document.getElementById('btnClear');
     const btnExample = document.getElementById('btnExample');
+    const btnDownload = document.getElementById('btnDownload');
+    const btnConvert = document.getElementById('btnConvert');
+    const toggleAuto = document.getElementById('toggleAuto');
 
     const EXAMPLE = `# Launching something new\n\nHey everyone — I’m excited to share: **MD → LinkedIn formatter**.\n\nUse *italic* for emphasis, **bold** for punch, and ***both*** for drama.\n\nCode-y bits: \`npm run build\`\n\n- Fast\n- Simple\n- Copy/paste friendly\n\n~~This line is struck~~ but we move on.\n\n[My site](https://example.com)`;
 
@@ -468,11 +476,54 @@
       elStatus.innerHTML = html;
     }
 
+    const LIMIT_POST = 3000;
+    const SEE_MORE = 210;
+
+    function renderStatus(output) {
+      const len = output.length;
+      const over = len > LIMIT_POST;
+      const seeMoreOver = len > SEE_MORE;
+
+      const parts = [];
+      parts.push(`Characters: <strong>${len}</strong> / ${LIMIT_POST}`);
+
+      if (seeMoreOver) {
+        parts.push(`<span class="hint">• “See more” after ~${SEE_MORE} chars</span>`);
+      } else {
+        parts.push(`<span class="hint">• “See more” cutoff ~${SEE_MORE}</span>`);
+      }
+
+      if (over) {
+        parts.push(`<span class="hint" style="color: color-mix(in srgb, var(--danger) 80%, var(--text));">• Over limit by ${len - LIMIT_POST}</span>`);
+      }
+
+      setStatus(parts.join(' '));
+    }
+
     function convertNow() {
       const input = elMd.value ?? '';
       const output = mdToLinkedInUnicode(input);
       elOut.value = output;
-      setStatus(`Characters: <strong>${output.length}</strong>`);
+      renderStatus(output);
+    }
+
+    function downloadOutput() {
+      const text = elOut.value;
+      if (!text) {
+        setStatus('Nothing to download.');
+        return;
+      }
+
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'linkedin-post.txt';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setStatus('Downloaded.');
     }
 
     async function copyOutput() {
@@ -498,7 +549,13 @@
       }
     }
 
-    elMd.addEventListener('input', convertNow);
+    function isAuto() {
+      return !!toggleAuto?.checked;
+    }
+
+    elMd.addEventListener('input', () => {
+      if (isAuto()) convertNow();
+    });
 
     btnCopy.addEventListener('click', copyOutput);
 
@@ -506,6 +563,22 @@
       elOut.focus();
       elOut.select();
       setStatus('Selected output.');
+    });
+
+    btnDownload.addEventListener('click', downloadOutput);
+
+    btnConvert.addEventListener('click', () => {
+      convertNow();
+      setStatus('Converted.');
+    });
+
+    toggleAuto.addEventListener('change', () => {
+      if (isAuto()) {
+        convertNow();
+        setStatus('Auto: on');
+      } else {
+        setStatus('Auto: off (click Convert)');
+      }
     });
 
     btnClear.addEventListener('click', () => {
