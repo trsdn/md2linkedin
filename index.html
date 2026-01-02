@@ -68,7 +68,7 @@
     }
 
     @media (min-width: 980px) {
-      .wrap { grid-template-columns: repeat(3, minmax(260px, 1fr)); }
+      .wrap { grid-template-columns: 1fr 1fr; }
     }
 
     .card {
@@ -193,103 +193,6 @@
       padding: 9px 10px;
       font-size: 13px;
       outline: none;
-    }
-
-    .tabs {
-      display: inline-flex;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      overflow: hidden;
-      background: color-mix(in srgb, var(--panel) 84%, transparent);
-    }
-
-    .tab {
-      border: 0;
-      background: transparent;
-      padding: 8px 12px;
-      color: var(--muted);
-      font-size: 12px;
-      cursor: pointer;
-    }
-
-    .tab.active {
-      color: var(--text);
-      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 32%, transparent), color-mix(in srgb, var(--accent2) 16%, transparent));
-    }
-
-    .liCard {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: color-mix(in srgb, var(--panel) 92%, transparent);
-      overflow: hidden;
-    }
-
-    .liTop {
-      display: grid;
-      grid-template-columns: 44px 1fr;
-      gap: 12px;
-      padding: 14px;
-      border-bottom: 1px solid var(--border);
-      align-items: center;
-    }
-
-    .avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--accent) 55%, transparent), transparent 55%),
-                  radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--accent2) 45%, transparent), transparent 55%),
-                  color-mix(in srgb, var(--panel) 70%, transparent);
-      border: 1px solid var(--border);
-    }
-
-    .liMeta {
-      line-height: 1.2;
-    }
-
-    .liName {
-      font-weight: 700;
-      font-size: 13px;
-      color: var(--text);
-    }
-
-    .liTitle {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .liTime {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    .liBody {
-      padding: 14px;
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-size: 14px;
-      line-height: 1.55;
-      color: var(--text);
-    }
-
-    .liCard.mobile {
-      max-width: 390px;
-    }
-
-    .liCard.mobile .liBody {
-      font-size: 13px;
-    }
-
-    .seeMore {
-      border: 0;
-      background: transparent;
-      color: var(--accent);
-      padding: 0;
-      margin-top: 8px;
-      font-size: 12px;
-      cursor: pointer;
     }
 
     dialog {
@@ -426,32 +329,6 @@
         </div>
         <div class="right">
           <div class="status" id="status"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card">
-      <header style="display:flex; align-items:center; justify-content: space-between; gap: 10px;">
-        <h2 style="margin:0; font-size:14px; letter-spacing: 0.3px; text-transform: uppercase; color: var(--muted);">LinkedIn preview</h2>
-        <div class="tabs" role="tablist" aria-label="Preview device">
-          <button class="tab active" id="tabDesktop" role="tab" aria-selected="true" type="button">Desktop</button>
-          <button class="tab" id="tabMobile" role="tab" aria-selected="false" type="button">Mobile</button>
-        </div>
-      </header>
-      <div style="padding: 14px;">
-        <div class="liCard" id="liCard">
-          <div class="liTop">
-            <div class="avatar" aria-hidden="true"></div>
-            <div class="liMeta">
-              <div class="liName">You · Your Name</div>
-              <div class="liTitle">Your Title · Now</div>
-              <div class="liTime" id="liMetaLine">Public • ✦</div>
-            </div>
-          </div>
-          <div class="liBody" id="liBody"></div>
-        </div>
-        <div class="hint" style="margin-top:10px;">
-          This is a visual mock. LinkedIn may render line breaks and Unicode slightly differently.
         </div>
       </div>
     </section>
@@ -820,11 +697,6 @@
     const btnCloseGuide = document.getElementById('btnCloseGuide');
     const bulletStyle = document.getElementById('bulletStyle');
 
-    const tabDesktop = document.getElementById('tabDesktop');
-    const tabMobile = document.getElementById('tabMobile');
-    const liCard = document.getElementById('liCard');
-    const liBody = document.getElementById('liBody');
-
     const EXAMPLE = `# Launching something new\n\nHey everyone — I’m excited to share: **MD → LinkedIn formatter**.\n\nUse *italic* for emphasis, **bold** for punch, and ***both*** for drama.\n\nCode-y bits: \`npm run build\`\n\n- Fast\n- Simple\n- Copy/paste friendly\n\n~~This line is struck~~ but we move on.\n\n[My site](https://example.com)`;
 
     function setStatus(html) {
@@ -834,40 +706,10 @@
     const LIMIT_POST = 3000;
     const SEE_MORE = 210;
 
-    const state = {
-      previewDevice: 'desktop',
-      previewExpanded: false,
-    };
-
     function getOpts() {
       return {
         bulletChar: bulletStyle?.value ?? '•',
       };
-    }
-
-    function renderPreview(output) {
-      if (!liBody) return;
-
-      const needsCollapse = output.length > SEE_MORE;
-      const shouldCollapse = needsCollapse && !state.previewExpanded;
-
-      const text = shouldCollapse ? output.slice(0, SEE_MORE).trimEnd() + '…' : output;
-      liBody.textContent = text;
-
-      // Add/replace See more button safely.
-      const existing = liBody.parentElement?.querySelector('.seeMore');
-      if (existing) existing.remove();
-      if (needsCollapse) {
-        const btn = document.createElement('button');
-        btn.className = 'seeMore';
-        btn.type = 'button';
-        btn.textContent = state.previewExpanded ? 'See less' : '…see more';
-        btn.addEventListener('click', () => {
-          state.previewExpanded = !state.previewExpanded;
-          renderPreview(output);
-        });
-        liBody.parentElement?.appendChild(btn);
-      }
     }
 
     function renderStatus(output) {
@@ -896,7 +738,6 @@
       const output = mdToLinkedInUnicode(input, getOpts());
       elOut.value = output;
       renderStatus(output);
-      renderPreview(output);
     }
 
     function downloadOutput() {
@@ -1114,26 +955,6 @@
       convertNow();
       setStatus(`Bullets: ${bulletStyle.value}`);
     });
-
-    function setDevice(device) {
-      state.previewDevice = device;
-      if (device === 'mobile') {
-        liCard?.classList.add('mobile');
-        tabMobile?.classList.add('active');
-        tabDesktop?.classList.remove('active');
-        tabMobile?.setAttribute('aria-selected', 'true');
-        tabDesktop?.setAttribute('aria-selected', 'false');
-      } else {
-        liCard?.classList.remove('mobile');
-        tabDesktop?.classList.add('active');
-        tabMobile?.classList.remove('active');
-        tabDesktop?.setAttribute('aria-selected', 'true');
-        tabMobile?.setAttribute('aria-selected', 'false');
-      }
-    }
-
-    tabDesktop.addEventListener('click', () => setDevice('desktop'));
-    tabMobile.addEventListener('click', () => setDevice('mobile'));
 
     btnGuide.addEventListener('click', () => {
       dlgGuide?.showModal();
