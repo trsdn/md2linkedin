@@ -179,6 +179,180 @@
       color: var(--muted);
     }
 
+    .pill input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+    }
+
+    select {
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel) 88%, transparent);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .tabs {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--panel) 84%, transparent);
+    }
+
+    .tab {
+      border: 0;
+      background: transparent;
+      padding: 8px 12px;
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      color: var(--text);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 32%, transparent), color-mix(in srgb, var(--accent2) 16%, transparent));
+    }
+
+    .previewWrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 18px 36px;
+    }
+
+    .previewGrid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+
+    @media (min-width: 980px) {
+      .previewGrid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .liCard {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--panel) 92%, transparent);
+      overflow: hidden;
+    }
+
+    .liTop {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 12px;
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--accent) 55%, transparent), transparent 55%),
+                  radial-gradient(circle at 70% 70%, color-mix(in srgb, var(--accent2) 45%, transparent), transparent 55%),
+                  color-mix(in srgb, var(--panel) 70%, transparent);
+      border: 1px solid var(--border);
+    }
+
+    .liMeta {
+      line-height: 1.2;
+    }
+
+    .liName {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .liTitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .liTime {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .liBody {
+      padding: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text);
+    }
+
+    .liCard.mobile {
+      max-width: 390px;
+    }
+
+    .liCard.mobile .liBody {
+      font-size: 13px;
+    }
+
+    .seeMore {
+      border: 0;
+      background: transparent;
+      color: var(--accent);
+      padding: 0;
+      margin-top: 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    dialog {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel);
+      color: var(--text);
+      width: min(900px, calc(100vw - 28px));
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+    }
+
+    .modalHead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modalBody {
+      padding: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .modalBody code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      color: color-mix(in srgb, var(--accent2) 65%, var(--text));
+    }
+
+    .twoCol {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 820px) {
+      .twoCol { grid-template-columns: 1fr 1fr; }
+    }
+
     .mono {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       color: color-mix(in srgb, var(--accent2) 65%, var(--text));
@@ -232,8 +406,19 @@
           <button id="btnConvert" class="primary" title="Convert now (useful when Auto is off)">Convert</button>
           <button id="btnExample">Insert example</button>
           <button id="btnClear" class="danger">Clear</button>
+          <button id="btnGuide">Guide</button>
         </div>
         <div class="right">
+          <label class="pill" style="padding: 7px 10px; gap: 10px;">
+            <span>Bullets</span>
+            <select id="bulletStyle" aria-label="Bullet style">
+              <option value="•">•</option>
+              <option value="●">●</option>
+              <option value="-">-</option>
+              <option value="✓">✓</option>
+              <option value="➤">➤</option>
+            </select>
+          </label>
           <label class="pill" style="padding: 7px 10px; gap: 10px;">
             <span>Auto</span>
             <input id="toggleAuto" type="checkbox" checked aria-label="Auto convert" />
@@ -258,12 +443,93 @@
     </section>
   </main>
 
+  <section class="previewWrap">
+    <div class="previewGrid">
+      <div class="card">
+        <header style="display:flex; align-items:center; justify-content: space-between; gap: 10px;">
+          <h2 style="margin:0; font-size:14px; letter-spacing: 0.3px; text-transform: uppercase; color: var(--muted);">LinkedIn preview</h2>
+          <div class="tabs" role="tablist" aria-label="Preview device">
+            <button class="tab active" id="tabDesktop" role="tab" aria-selected="true" type="button">Desktop</button>
+            <button class="tab" id="tabMobile" role="tab" aria-selected="false" type="button">Mobile</button>
+          </div>
+        </header>
+        <div style="padding: 14px;">
+          <div class="liCard" id="liCard">
+            <div class="liTop">
+              <div class="avatar" aria-hidden="true"></div>
+              <div class="liMeta">
+                <div class="liName">You · Your Name</div>
+                <div class="liTitle">Your Title · Now</div>
+                <div class="liTime" id="liMetaLine">Public • ✦</div>
+              </div>
+            </div>
+            <div class="liBody" id="liBody"></div>
+          </div>
+          <div class="hint" style="margin-top:10px;">
+            This is a visual mock. LinkedIn may render line breaks and Unicode slightly differently.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <header><h2>Tips (no backend)</h2></header>
+        <div style="padding:14px;" class="hint">
+          <div style="margin-bottom: 10px;"><strong style="color: var(--text);">Paste from Word / Google Docs:</strong> if your clipboard contains rich text, this tool will try to convert it into Markdown automatically.</div>
+          <div style="margin-bottom: 10px;"><strong style="color: var(--text);">Tables:</strong> pipe tables are converted to readable aligned text.</div>
+          <div><strong style="color: var(--text);">Code blocks:</strong> fenced blocks (<span class="mono">```</span>) are supported and rendered as monospace Unicode.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <div class="footer">
     <p>
       Notes: Unicode “font” letters may look different across devices, and some characters (especially emojis or non‑Latin scripts) are left unchanged.
       If LinkedIn ever changes how it treats certain Unicode ranges, results may vary.
     </p>
   </div>
+
+  <dialog id="dlgGuide">
+    <div class="modalHead">
+      <div>
+        <div style="font-weight: 700;">Formatting guide</div>
+        <div class="hint">Supported syntax, shortcuts, and accessibility notes.</div>
+      </div>
+      <button id="btnCloseGuide" type="button">Close</button>
+    </div>
+    <div class="modalBody">
+      <div class="twoCol">
+        <div>
+          <div style="font-weight: 700; color: var(--text); margin-bottom: 6px;">Markdown → LinkedIn</div>
+          <ul style="margin: 0; padding-left: 18px;">
+            <li><code>**bold**</code></li>
+            <li><code>*italic*</code></li>
+            <li><code>***bolditalic***</code></li>
+            <li><code>`inline code`</code></li>
+            <li><code>```\ncode block\n```</code></li>
+            <li><code>~~strikethrough~~</code></li>
+            <li><code># Heading</code> → bold</li>
+            <li><code>- bullet</code> / <code>* bullet</code> → chosen bullet style</li>
+            <li><code>[text](https://example.com)</code> → <code>text (https://example.com)</code></li>
+            <li>Tables: pipe tables are converted to aligned plain text</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-weight: 700; color: var(--text); margin-bottom: 6px;">Shortcuts</div>
+          <ul style="margin: 0; padding-left: 18px;">
+            <li><code>Cmd/Ctrl + Enter</code>: Convert</li>
+            <li><code>Cmd/Ctrl + Shift + C</code>: Copy output</li>
+            <li><code>Esc</code>: Close this guide</li>
+          </ul>
+
+          <div style="font-weight: 700; color: var(--text); margin: 12px 0 6px;">Accessibility note</div>
+          <div>
+            Unicode “fake bold/italics” can confuse screen readers and may hurt searchability. Use sparingly for key highlights.
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
 
   <script>
     // --- Unicode mapping helpers ---
@@ -357,9 +623,11 @@
 
     // --- Markdown-ish conversion (intentionally simple) ---
 
-    function normalizeLines(md) {
+    function normalizeLines(md, opts) {
       const lines = md.replace(/\r\n/g, '\n').split('\n');
       const out = [];
+
+      const bulletChar = (opts?.bulletChar ?? '•').toString();
 
       for (const line of lines) {
         // Headings: #, ##, ### -> bold line content
@@ -372,12 +640,102 @@
         // Bullets: -, *, + (space) -> convert to "• "
         const bullet = line.match(/^\s{0,3}([-*+])\s+(.*)$/);
         if (bullet) {
-          out.push('• ' + bullet[2]);
+          // Preserve indentation (roughly) by keeping leading spaces.
+          const leading = (line.match(/^(\s{0,12})/)?.[1] ?? '');
+          out.push(leading + bulletChar + ' ' + bullet[2]);
           continue;
         }
 
         // Numbered list: "1. " -> keep as-is
         out.push(line);
+      }
+
+      return out.join('\n');
+    }
+
+    function protectFencedCodeBlocks(md) {
+      // Protect fenced code blocks so other transforms don't touch them.
+      // Supports ```lang?\n...\n```
+      const tokens = [];
+      const out = md.replace(/```[^\n]*\n([\s\S]*?)\n```/g, (m, code) => {
+        const id = tokens.length;
+        tokens.push(code);
+        return `\uE000FENCE${id}\uE000`;
+      });
+      return { out, tokens };
+    }
+
+    function restoreFencedCodeBlocks(text, tokens) {
+      return text.replace(/\uE000FENCE(\d+)\uE000/g, (m, id) => {
+        const code = tokens[Number(id)] ?? '';
+        // Stylize as monospace but preserve whitespace/newlines.
+        const body = code.split('\n').map(line => stylize(STYLE.MONO, line)).join('\n');
+        return `\n${body}\n`;
+      });
+    }
+
+    function convertTables(md) {
+      // Convert GitHub-flavored pipe tables into aligned plain text.
+      // Very small & pragmatic: looks for blocks of 2+ lines with pipes and a separator line.
+      const lines = md.replace(/\r\n/g, '\n').split('\n');
+      const out = [];
+
+      function isSeparatorLine(line) {
+        // e.g. | --- | :---: | ---: |
+        const cleaned = line.trim();
+        if (!cleaned.includes('|')) return false;
+        const parts = cleaned.split('|').map(s => s.trim()).filter(Boolean);
+        if (parts.length < 2) return false;
+        return parts.every(p => /^:?-{3,}:?$/.test(p));
+      }
+
+      function parseRow(line) {
+        let s = line.trim();
+        if (s.startsWith('|')) s = s.slice(1);
+        if (s.endsWith('|')) s = s.slice(0, -1);
+        return s.split('|').map(c => c.trim());
+      }
+
+      for (let i = 0; i < lines.length; i++) {
+        const header = lines[i];
+        const sep = lines[i + 1];
+        if (sep != null && header.includes('|') && isSeparatorLine(sep)) {
+          const rows = [parseRow(header)];
+          i += 2;
+          while (i < lines.length && lines[i].includes('|') && lines[i].trim() !== '') {
+            rows.push(parseRow(lines[i]));
+            i++;
+          }
+          i--; // compensate for loop increment
+
+          const colCount = Math.max(...rows.map(r => r.length));
+          const widths = Array.from({ length: colCount }, (_, c) => {
+            return Math.max(...rows.map(r => (r[c] ?? '').length));
+          });
+
+          const formatted = rows.map((r, idx) => {
+            const cells = [];
+            for (let c = 0; c < colCount; c++) {
+              const cell = (r[c] ?? '');
+              const pad = ' '.repeat(Math.max(0, widths[c] - cell.length));
+              cells.push(cell + pad);
+            }
+            const line = cells.join(' | ');
+            if (idx === 0) {
+              const rule = widths.map(w => '-'.repeat(Math.max(3, w))).join('-|-');
+              return [line, rule];
+            }
+            return [line];
+          }).flat();
+
+          out.push(...formatted);
+
+          // If we stopped because of blank line, keep it.
+          if (lines[i + 1] === '') out.push('');
+          continue;
+        }
+
+        out.push(lines[i]);
       }
 
       return out.join('\n');
@@ -437,11 +795,23 @@
     function cleanup(md) {
       // Remove any remaining markdown markers that we didn't convert.
       // (We keep things conservative so we don't accidentally remove intended characters.)
-      return md;
+      return md
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/[ \t]+\n/g, '\n');
     }
 
-    function mdToLinkedInUnicode(md) {
-      let s = normalizeLines(md);
+    function mdToLinkedInUnicode(md, opts) {
+      let s = md;
+
+      // 1) Protect fenced code blocks and inline code before any other pass.
+      const fenced = protectFencedCodeBlocks(s);
+      s = fenced.out;
+
+      // 2) Tables to readable text (works best before emphasis).
+      s = convertTables(s);
+
+      // 3) Headings/bullets normalization.
+      s = normalizeLines(s, opts);
       s = convertLinks(s);
 
       const protectedCode = protectCodeSpans(s);
@@ -451,6 +821,7 @@
       s = applyEmphasis(s);
 
       s = restoreCodeSpans(s, protectedCode.tokens);
+      s = restoreFencedCodeBlocks(s, fenced.tokens);
       s = cleanup(s);
 
       return s;
@@ -469,6 +840,15 @@
     const btnDownload = document.getElementById('btnDownload');
     const btnConvert = document.getElementById('btnConvert');
     const toggleAuto = document.getElementById('toggleAuto');
+    const btnGuide = document.getElementById('btnGuide');
+    const dlgGuide = document.getElementById('dlgGuide');
+    const btnCloseGuide = document.getElementById('btnCloseGuide');
+    const bulletStyle = document.getElementById('bulletStyle');
+
+    const tabDesktop = document.getElementById('tabDesktop');
+    const tabMobile = document.getElementById('tabMobile');
+    const liCard = document.getElementById('liCard');
+    const liBody = document.getElementById('liBody');
 
     const EXAMPLE = `# Launching something new\n\nHey everyone — I’m excited to share: **MD → LinkedIn formatter**.\n\nUse *italic* for emphasis, **bold** for punch, and ***both*** for drama.\n\nCode-y bits: \`npm run build\`\n\n- Fast\n- Simple\n- Copy/paste friendly\n\n~~This line is struck~~ but we move on.\n\n[My site](https://example.com)`;
 
@@ -478,6 +858,42 @@
 
     const LIMIT_POST = 3000;
     const SEE_MORE = 210;
+
+    const state = {
+      previewDevice: 'desktop',
+      previewExpanded: false,
+    };
+
+    function getOpts() {
+      return {
+        bulletChar: bulletStyle?.value ?? '•',
+      };
+    }
+
+    function renderPreview(output) {
+      if (!liBody) return;
+
+      const needsCollapse = output.length > SEE_MORE;
+      const shouldCollapse = needsCollapse && !state.previewExpanded;
+
+      const text = shouldCollapse ? output.slice(0, SEE_MORE).trimEnd() + '…' : output;
+      liBody.textContent = text;
+
+      // Add/replace See more button safely.
+      const existing = liBody.parentElement?.querySelector('.seeMore');
+      if (existing) existing.remove();
+      if (needsCollapse) {
+        const btn = document.createElement('button');
+        btn.className = 'seeMore';
+        btn.type = 'button';
+        btn.textContent = state.previewExpanded ? 'See less' : '…see more';
+        btn.addEventListener('click', () => {
+          state.previewExpanded = !state.previewExpanded;
+          renderPreview(output);
+        });
+        liBody.parentElement?.appendChild(btn);
+      }
+    }
 
     function renderStatus(output) {
       const len = output.length;
@@ -502,9 +918,10 @@
 
     function convertNow() {
       const input = elMd.value ?? '';
-      const output = mdToLinkedInUnicode(input);
+      const output = mdToLinkedInUnicode(input, getOpts());
       elOut.value = output;
       renderStatus(output);
+      renderPreview(output);
     }
 
     function downloadOutput() {
@@ -557,6 +974,143 @@
       if (isAuto()) convertNow();
     });
 
+    function insertAtCursor(textarea, text) {
+      const start = textarea.selectionStart ?? textarea.value.length;
+      const end = textarea.selectionEnd ?? textarea.value.length;
+      const before = textarea.value.slice(0, start);
+      const after = textarea.value.slice(end);
+      textarea.value = before + text + after;
+      const newPos = start + text.length;
+      textarea.setSelectionRange(newPos, newPos);
+    }
+
+    function htmlToMarkdown(html) {
+      // Lightweight HTML → Markdown converter for common clipboard sources.
+      // Focus: paragraphs, line breaks, strong/em, links, lists, code/pre.
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+
+      function textOf(node) {
+        return (node.textContent ?? '').replace(/\u00A0/g, ' ');
+      }
+
+      function walk(node, inPre) {
+        if (!node) return '';
+        if (node.nodeType === Node.TEXT_NODE) {
+          return inPre ? node.nodeValue ?? '' : (node.nodeValue ?? '').replace(/\s+/g, ' ');
+        }
+        if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+        const el = node;
+        const tag = el.tagName.toLowerCase();
+
+        // Remove scripts/styles.
+        if (tag === 'script' || tag === 'style') return '';
+
+        if (tag === 'br') return '\n';
+
+        if (tag === 'p' || tag === 'div') {
+          const inner = Array.from(el.childNodes).map(n => walk(n, false)).join('');
+          return inner.trim() ? inner.trim() + '\n\n' : '';
+        }
+
+        if (tag === 'strong' || tag === 'b') {
+          const inner = Array.from(el.childNodes).map(n => walk(n, inPre)).join('');
+          return `**${inner}**`;
+        }
+
+        if (tag === 'em' || tag === 'i') {
+          const inner = Array.from(el.childNodes).map(n => walk(n, inPre)).join('');
+          return `*${inner}*`;
+        }
+
+        if (tag === 's' || tag === 'del' || tag === 'strike') {
+          const inner = Array.from(el.childNodes).map(n => walk(n, inPre)).join('');
+          return `~~${inner}~~`;
+        }
+
+        if (tag === 'code' && !inPre) {
+          const inner = textOf(el);
+          return '`' + inner.replace(/`/g, '\\`') + '`';
+        }
+
+        if (tag === 'pre') {
+          // Prefer nested code, but fall back to textContent.
+          const codeEl = el.querySelector('code');
+          const content = (codeEl ? textOf(codeEl) : textOf(el)).replace(/\n+$/g, '');
+          return '\n\n```\n' + content + '\n```\n\n';
+        }
+
+        if (tag === 'a') {
+          const href = el.getAttribute('href') || '';
+          const inner = Array.from(el.childNodes).map(n => walk(n, inPre)).join('').trim() || href;
+          if (!href) return inner;
+          return `[${inner}](${href})`;
+        }
+
+        if (tag === 'ul') {
+          const items = Array.from(el.children).filter(c => c.tagName?.toLowerCase() === 'li');
+          const md = items.map(li => `- ${walk(li, false).trim()}`).join('\n');
+          return md + '\n\n';
+        }
+
+        if (tag === 'ol') {
+          const items = Array.from(el.children).filter(c => c.tagName?.toLowerCase() === 'li');
+          const md = items.map((li, i) => `${i + 1}. ${walk(li, false).trim()}`).join('\n');
+          return md + '\n\n';
+        }
+
+        if (tag === 'li') {
+          // li content may contain nested lists
+          const inner = Array.from(el.childNodes).map(n => walk(n, false)).join('');
+          return inner.replace(/\n\n+/g, '\n').trim();
+        }
+
+        if (tag === 'table') {
+          // Convert HTML table to Markdown pipe table.
+          const rows = Array.from(el.querySelectorAll('tr'));
+          const grid = rows.map(tr => Array.from(tr.querySelectorAll('th,td')).map(c => textOf(c).trim()));
+          if (grid.length === 0) return '';
+          const header = grid[0];
+          const sep = header.map(() => '---');
+          const lines = [];
+          lines.push('| ' + header.join(' | ') + ' |');
+          lines.push('| ' + sep.join(' | ') + ' |');
+          for (let r = 1; r < grid.length; r++) {
+            lines.push('| ' + grid[r].join(' | ') + ' |');
+          }
+          return lines.join('\n') + '\n\n';
+        }
+
+        // Default: recurse.
+        return Array.from(el.childNodes).map(n => walk(n, inPre)).join('');
+      }
+
+      const md = walk(doc.body, false)
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
+      return md;
+    }
+
+    elMd.addEventListener('paste', (e) => {
+      const html = e.clipboardData?.getData('text/html');
+      if (!html) return;
+
+      const md = htmlToMarkdown(html);
+      if (!md) return;
+
+      // If it's basically the same as plain text, don't interfere.
+      const plain = (e.clipboardData?.getData('text/plain') ?? '').trim();
+      if (plain && (plain === md || plain.replace(/\s+/g, ' ') === md.replace(/\s+/g, ' '))) {
+        return;
+      }
+
+      e.preventDefault();
+      insertAtCursor(elMd, md);
+      if (isAuto()) convertNow();
+      setStatus('Pasted rich text → converted to Markdown.');
+    });
+
     btnCopy.addEventListener('click', copyOutput);
 
     btnSelect.addEventListener('click', () => {
@@ -578,6 +1132,63 @@
         setStatus('Auto: on');
       } else {
         setStatus('Auto: off (click Convert)');
+      }
+    });
+
+    bulletStyle.addEventListener('change', () => {
+      convertNow();
+      setStatus(`Bullets: ${bulletStyle.value}`);
+    });
+
+    function setDevice(device) {
+      state.previewDevice = device;
+      if (device === 'mobile') {
+        liCard?.classList.add('mobile');
+        tabMobile?.classList.add('active');
+        tabDesktop?.classList.remove('active');
+        tabMobile?.setAttribute('aria-selected', 'true');
+        tabDesktop?.setAttribute('aria-selected', 'false');
+      } else {
+        liCard?.classList.remove('mobile');
+        tabDesktop?.classList.add('active');
+        tabMobile?.classList.remove('active');
+        tabDesktop?.setAttribute('aria-selected', 'true');
+        tabMobile?.setAttribute('aria-selected', 'false');
+      }
+    }
+
+    tabDesktop.addEventListener('click', () => setDevice('desktop'));
+    tabMobile.addEventListener('click', () => setDevice('mobile'));
+
+    btnGuide.addEventListener('click', () => {
+      dlgGuide?.showModal();
+    });
+
+    btnCloseGuide.addEventListener('click', () => dlgGuide?.close());
+
+    dlgGuide.addEventListener('cancel', (e) => {
+      // Keep default Esc-to-close behavior, but we can add custom logic later.
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const isMac = navigator.platform.toLowerCase().includes('mac');
+      const mod = isMac ? e.metaKey : e.ctrlKey;
+
+      if (e.key === 'Escape' && dlgGuide?.open) {
+        dlgGuide.close();
+        return;
+      }
+
+      if (mod && e.key === 'Enter') {
+        e.preventDefault();
+        convertNow();
+        setStatus('Converted.');
+        return;
+      }
+
+      if (mod && e.shiftKey && (e.key.toLowerCase() === 'c')) {
+        e.preventDefault();
+        copyOutput();
       }
     });
 
