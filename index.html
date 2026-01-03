@@ -831,7 +831,6 @@
     }
 
     const LIMIT_POST = 3000;
-    const SEE_MORE = 210;
 
     function getOpts() {
       return {
@@ -842,16 +841,9 @@
     function renderStatus(output) {
       const len = output.length;
       const over = len > LIMIT_POST;
-      const seeMoreOver = len > SEE_MORE;
 
       const parts = [];
       parts.push(`Characters: <strong>${len}</strong> / ${LIMIT_POST}`);
-
-      if (seeMoreOver) {
-        parts.push(`<span class="hint">• “See more” after ~${SEE_MORE} chars</span>`);
-      } else {
-        parts.push(`<span class="hint">• “See more” cutoff ~${SEE_MORE}</span>`);
-      }
 
       if (over) {
         parts.push(`<span class="hint" style="color: color-mix(in srgb, var(--danger) 80%, var(--text));">• Over limit by ${len - LIMIT_POST}</span>`);
