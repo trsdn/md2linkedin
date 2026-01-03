@@ -1,0 +1,1412 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MD → LinkedIn Unicode Formatter</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f1a2e;
+      --text: #e8eefc;
+      --muted: #a8b3cf;
+      --border: rgba(232, 238, 252, 0.14);
+      --accent: #7aa2ff;
+      --accent2: #5ef0c2;
+      --danger: #ff6b6b;
+      --ctl-h: 40px;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f6f7fb;
+        --panel: #ffffff;
+        --text: #0b1220;
+        --muted: #4c566a;
+        --border: rgba(11, 18, 32, 0.14);
+        --accent: #2f62ff;
+        --accent2: #0bbf8a;
+        --danger: #d64545;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1000px 700px at 20% 10%, rgba(122, 162, 255, 0.22), transparent 60%),
+                  radial-gradient(900px 650px at 90% 20%, rgba(94, 240, 194, 0.18), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      max-width: 1280px;
+      margin: 28px auto 10px;
+      padding: 0 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      letter-spacing: 0.2px;
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .wrap {
+      max-width: 1280px;
+      margin: 18px auto 36px;
+      padding: 0 18px;
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 980px) {
+      .wrap { grid-template-columns: 1fr 1fr; }
+    }
+
+    .card {
+      background: color-mix(in srgb, var(--panel) 92%, transparent);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.16);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card header {
+      margin: 0;
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--border);
+      max-width: unset;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 380px;
+      resize: vertical;
+      border: 0;
+      outline: none;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+      background: transparent;
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      flex: 1 1 auto;
+    }
+
+    .editorBar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel) 92%, transparent);
+    }
+
+    .editorBar .group {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .iconBtn {
+      width: 36px;
+      height: 34px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text);
+    }
+
+    .iconBtn:hover {
+      border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+      background: color-mix(in srgb, var(--panel) 80%, transparent);
+    }
+
+    .iconBtn:active { transform: translateY(1px); }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      display: inline-block;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.92;
+    }
+
+    .sep {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+      margin: 0 6px;
+    }
+
+    .countBadge {
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel) 88%, transparent);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .countBadge strong {
+      color: var(--text);
+      font-weight: 650;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .toolbar .left,
+    .toolbar .right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel) 88%, transparent);
+      color: var(--text);
+      border-radius: 10px;
+      height: var(--ctl-h);
+      padding: 0 12px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.05s ease, border-color 0.15s ease, background 0.15s ease;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    button:hover { border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); }
+    button:active { transform: translateY(1px); }
+
+    .primary {
+      border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 42%, transparent), color-mix(in srgb, var(--accent2) 20%, transparent));
+    }
+
+    .danger {
+      border-color: color-mix(in srgb, var(--danger) 50%, var(--border));
+      color: color-mix(in srgb, var(--danger) 80%, var(--text));
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .row {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 18px 26px;
+    }
+
+    .pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel) 84%, transparent);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .toolbar .pill {
+      height: var(--ctl-h);
+      padding: 0 12px;
+      gap: 10px;
+    }
+
+    .pill input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+    }
+
+    select {
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel) 88%, transparent);
+      color: var(--text);
+      border-radius: 10px;
+      height: calc(var(--ctl-h) - 6px);
+      padding: 0 10px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    dialog {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel);
+      color: var(--text);
+      width: min(900px, calc(100vw - 28px));
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+    }
+
+    .modalHead {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modalBody {
+      padding: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .modalBody code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      color: color-mix(in srgb, var(--accent2) 65%, var(--text));
+    }
+
+    .twoCol {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 820px) {
+      .twoCol { grid-template-columns: 1fr 1fr; }
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      color: color-mix(in srgb, var(--accent2) 65%, var(--text));
+    }
+
+    .status {
+      font-size: 12px;
+      color: var(--muted);
+      min-height: 16px;
+    }
+
+    .status strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .footer {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 18px 34px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MD → LinkedIn Unicode Formatter</h1>
+    <p class="sub">
+      Paste Markdown on the left. Get “LinkedIn-style” bold/italic/mono on the right using Unicode letter variants.
+      This is plain text output (no HTML), so you can paste it into LinkedIn.
+    </p>
+  </header>
+
+  <div class="row">
+    <div class="pill">
+      Supports: <span class="mono">**bold**</span>, <span class="mono">*italic*</span>, <span class="mono">***bolditalic***</span>,
+      <span class="mono">`code`</span>, <span class="mono">~~strike~~</span>, headings, bullets, and <span class="mono">[text](url)</span>.
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section class="card">
+      <header><h2>Markdown input</h2></header>
+      <div class="editorBar" aria-label="Editor toolbar">
+        <div class="group" role="toolbar" aria-label="Formatting">
+          <button class="iconBtn" id="tbBold" type="button" title="Bold (wrap with **)"><span style="font-weight:800; font-size:15px; letter-spacing:0.2px;">B</span></button>
+          <button class="iconBtn" id="tbItalic" type="button" title="Italic (wrap with *)"><span style="font-style:italic; font-size:15px;">I</span></button>
+          <button class="iconBtn" id="tbStrike" type="button" title="Strikethrough (wrap with ~~)"><span style="text-decoration: line-through; font-size:15px;">S</span></button>
+          <button class="iconBtn" id="tbLink" type="button" title="Link ([text](url))" aria-label="Insert link">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 0 0-7.07-7.07L11 2.86"/><path d="M14 11a5 5 0 0 0-7.07 0L4.81 13.1a5 5 0 0 0 7.07 7.07L13 21.14"/></svg>
+          </button>
+
+          <span class="sep" aria-hidden="true"></span>
+
+          <button class="iconBtn" id="tbBullets" type="button" title="Bulleted list" aria-label="Bulleted list">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M4 6h.01"/><path d="M4 12h.01"/><path d="M4 18h.01"/></svg>
+          </button>
+          <button class="iconBtn" id="tbNumbered" type="button" title="Numbered list" aria-label="Numbered list">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h12"/><path d="M9 12h12"/><path d="M9 18h12"/><path d="M4 6h1"/><path d="M4 12h1"/><path d="M4 18h1"/></svg>
+          </button>
+          <button class="iconBtn" id="tbQuote" type="button" title="Quote (prefix > )" aria-label="Blockquote">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h4v5H8.5A2.5 2.5 0 0 0 6 14.5V17"/><path d="M17 7h4v5h-2.5A2.5 2.5 0 0 0 16 14.5V17"/></svg>
+          </button>
+          <button class="iconBtn" id="tbCode" type="button" title="Code (inline/backticks or fenced)" aria-label="Code">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 9 4 12l4 3"/><path d="M16 9l4 3-4 3"/><path d="M14 6 10 18"/></svg>
+          </button>
+
+          <span class="sep" aria-hidden="true"></span>
+
+          <button class="iconBtn" id="tbUndo" type="button" title="Undo" aria-label="Undo">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-4"/></svg>
+          </button>
+          <button class="iconBtn" id="tbRedo" type="button" title="Redo" aria-label="Redo">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h4"/></svg>
+          </button>
+        </div>
+        <div class="countBadge" id="mdCount" aria-label="Markdown character count"><strong>0</strong> characters</div>
+      </div>
+      <textarea id="md" spellcheck="false" placeholder="# Headline\n\nWrite **bold**, *italic*, ***both***, `code`, ~~strike~~.\n\n- Bullet 1\n- Bullet 2\n\n[My site](https://example.com)"></textarea>
+      <div class="hint" style="padding: 0 14px 12px;">
+        <div style="margin-bottom: 6px;"><strong style="color: var(--text);">Paste from Word / Google Docs:</strong> if your clipboard contains rich text, this tool will try to convert it into Markdown automatically.</div>
+        <div style="margin-bottom: 6px;"><strong style="color: var(--text);">Tables:</strong> pipe tables are converted to readable aligned text.</div>
+        <div><strong style="color: var(--text);">Code blocks:</strong> fenced blocks (<span class="mono">```</span>) are supported and rendered as monospace Unicode.</div>
+      </div>
+      <div class="toolbar">
+        <div class="left">
+          <button id="btnConvert" class="primary" title="Convert now (useful when Auto is off)">Convert</button>
+          <button id="btnExample">Insert example</button>
+          <button id="btnClear" class="danger">Clear</button>
+          <button id="btnGuide">Guide</button>
+        </div>
+        <div class="right">
+          <label class="pill">
+            <span>Bullets</span>
+            <select id="bulletStyle" aria-label="Bullet style">
+              <option value="•">•</option>
+              <option value="●">●</option>
+              <option value="-">-</option>
+              <option value="✓">✓</option>
+              <option value="➤">➤</option>
+            </select>
+          </label>
+          <label class="pill">
+            <span>Auto</span>
+            <input id="toggleAuto" type="checkbox" checked aria-label="Auto convert" />
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <header><h2>LinkedIn-ready output</h2></header>
+      <textarea id="out" spellcheck="false" readonly placeholder="Your formatted text will appear here..."></textarea>
+      <div class="toolbar">
+        <div class="left">
+          <button id="btnCopy" class="primary">Copy</button>
+          <button id="btnSelect">Select all</button>
+          <button id="btnDownload">Download .txt</button>
+        </div>
+        <div class="right">
+          <div class="status" id="status"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer">
+    <p>
+      Notes: Unicode “font” letters may look different across devices, and some characters (especially emojis or non‑Latin scripts) are left unchanged.
+      If LinkedIn ever changes how it treats certain Unicode ranges, results may vary.
+    </p>
+    <p>
+      Built by <a href="https://www.linkedin.com/in/torstenmahr" target="_blank" rel="noopener noreferrer">Torsten Mahr</a>.
+    </p>
+  </div>
+
+  <dialog id="dlgGuide">
+    <div class="modalHead">
+      <div>
+        <div style="font-weight: 700;">Formatting guide</div>
+        <div class="hint">Supported syntax, shortcuts, and accessibility notes.</div>
+      </div>
+      <button id="btnCloseGuide" type="button">Close</button>
+    </div>
+    <div class="modalBody">
+      <div class="twoCol">
+        <div>
+          <div style="font-weight: 700; color: var(--text); margin-bottom: 6px;">Markdown → LinkedIn</div>
+          <ul style="margin: 0; padding-left: 18px;">
+            <li><code>**bold**</code></li>
+            <li><code>*italic*</code></li>
+            <li><code>***bolditalic***</code></li>
+            <li><code>`inline code`</code></li>
+            <li><code>```\ncode block\n```</code></li>
+            <li><code>~~strikethrough~~</code></li>
+            <li><code># Heading</code> → bold</li>
+            <li><code>- bullet</code> / <code>* bullet</code> → chosen bullet style</li>
+            <li><code>[text](https://example.com)</code> → <code>text (https://example.com)</code></li>
+            <li>Tables: pipe tables are converted to aligned plain text</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-weight: 700; color: var(--text); margin-bottom: 6px;">Shortcuts</div>
+          <ul style="margin: 0; padding-left: 18px;">
+            <li><code>Cmd/Ctrl + Enter</code>: Convert</li>
+            <li><code>Cmd/Ctrl + Shift + C</code>: Copy output</li>
+            <li><code>Esc</code>: Close this guide</li>
+          </ul>
+
+          <div style="font-weight: 700; color: var(--text); margin: 12px 0 6px;">Accessibility note</div>
+          <div>
+            Unicode “fake bold/italics” can confuse screen readers and may hurt searchability. Use sparingly for key highlights.
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    // --- Unicode mapping helpers ---
+
+    const STYLE = {
+      BOLD: 'bold',
+      ITALIC: 'italic',
+      BOLD_ITALIC: 'boldItalic',
+      MONO: 'mono',
+    };
+
+    // Mathematical Alphanumeric Symbols blocks.
+    // Use fromCodePoint to handle astral plane characters correctly.
+    const RANGES = {
+      [STYLE.BOLD]: {
+        upper: 0x1D400,
+        lower: 0x1D41A,
+        digit: 0x1D7CE,
+      },
+      [STYLE.ITALIC]: {
+        upper: 0x1D434,
+        lower: 0x1D44E,
+        digit: null, // no dedicated italic digits
+      },
+      [STYLE.BOLD_ITALIC]: {
+        upper: 0x1D468,
+        lower: 0x1D482,
+        digit: null, // no dedicated bold-italic digits
+      },
+      [STYLE.MONO]: {
+        upper: 0x1D670,
+        lower: 0x1D68A,
+        digit: 0x1D7F6,
+      },
+    };
+
+    // Known italic lowercase exceptions in Unicode mathematical alphabets.
+    // The italic small 'h' is U+210E (PLANCK CONSTANT) instead of U+1D455.
+    const ITALIC_EXCEPTIONS = {
+      'h': '\u210E', // ℎ
+    };
+
+    function mapChar(style, ch) {
+      const r = RANGES[style];
+      if (!r) return ch;
+
+      if (style === STYLE.ITALIC && ITALIC_EXCEPTIONS[ch]) {
+        return ITALIC_EXCEPTIONS[ch];
+      }
+
+      const code = ch.codePointAt(0);
+      // A-Z
+      if (code >= 0x41 && code <= 0x5A) {
+        return String.fromCodePoint(r.upper + (code - 0x41));
+      }
+      // a-z
+      if (code >= 0x61 && code <= 0x7A) {
+        return String.fromCodePoint(r.lower + (code - 0x61));
+      }
+      // 0-9
+      if (code >= 0x30 && code <= 0x39 && r.digit != null) {
+        return String.fromCodePoint(r.digit + (code - 0x30));
+      }
+
+      return ch;
+    }
+
+    function stylize(style, text) {
+      // Spread iterates code points (handles surrogate pairs).
+      return Array.from(text).map(ch => mapChar(style, ch)).join('');
+    }
+
+    function strike(text) {
+      // Combine LONG STROKE OVERLAY (U+0336) after each character.
+      // Skip newlines; keep spaces unstruck to look less noisy.
+      const overlay = '\u0336';
+      let out = '';
+      for (const ch of Array.from(text)) {
+        if (ch === '\n' || ch === '\r') {
+          out += ch;
+          continue;
+        }
+        if (ch === ' ' || ch === '\t') {
+          out += ch;
+          continue;
+        }
+        out += ch + overlay;
+      }
+      return out;
+    }
+
+    // --- Markdown-ish conversion (intentionally simple) ---
+
+    function normalizeLines(md, opts) {
+      const lines = md.replace(/\r\n/g, '\n').split('\n');
+      const out = [];
+
+      const bulletChar = (opts?.bulletChar ?? '•').toString();
+
+      for (const line of lines) {
+        // Headings: #, ##, ### -> bold line content
+        const heading = line.match(/^\s{0,3}(#{1,6})\s+(.*)$/);
+        if (heading) {
+          out.push('**' + heading[2].trim() + '**');
+          continue;
+        }
+
+        // Bullets: -, *, + (space) -> convert to "• "
+        const bullet = line.match(/^\s{0,3}([-*+])\s+(.*)$/);
+        if (bullet) {
+          // Preserve indentation (roughly) by keeping leading spaces.
+          const leading = (line.match(/^(\s{0,12})/)?.[1] ?? '');
+          out.push(leading + bulletChar + ' ' + bullet[2]);
+          continue;
+        }
+
+        // Numbered list: "1. " -> keep as-is
+        out.push(line);
+      }
+
+      return out.join('\n');
+    }
+
+    function protectFencedCodeBlocks(md) {
+      // Protect fenced code blocks so other transforms don't touch them.
+      // Supports ```lang?\n...\n```
+      const tokens = [];
+      const out = md.replace(/```[^\n]*\n([\s\S]*?)\n```/g, (m, code) => {
+        const id = tokens.length;
+        tokens.push(code);
+        return `\uE000FENCE${id}\uE000`;
+      });
+      return { out, tokens };
+    }
+
+    function restoreFencedCodeBlocks(text, tokens) {
+      return text.replace(/\uE000FENCE(\d+)\uE000/g, (m, id) => {
+        const code = tokens[Number(id)] ?? '';
+        // Stylize as monospace but preserve whitespace/newlines.
+        const body = code.split('\n').map(line => stylize(STYLE.MONO, line)).join('\n');
+        return `\n${body}\n`;
+      });
+    }
+
+    function convertTables(md) {
+      // Convert GitHub-flavored pipe tables into aligned plain text.
+      // Very small & pragmatic: looks for blocks of 2+ lines with pipes and a separator line.
+      const lines = md.replace(/\r\n/g, '\n').split('\n');
+      const out = [];
+
+      function isSeparatorLine(line) {
+        // e.g. | --- | :---: | ---: |
+        const cleaned = line.trim();
+        if (!cleaned.includes('|')) return false;
+        const parts = cleaned.split('|').map(s => s.trim()).filter(Boolean);
+        if (parts.length < 2) return false;
+        return parts.every(p => /^:?-{3,}:?$/.test(p));
+      }
+
+      function parseRow(line) {
+        let s = line.trim();
+        if (s.startsWith('|')) s = s.slice(1);
+        if (s.endsWith('|')) s = s.slice(0, -1);
+        return s.split('|').map(c => c.trim());
+      }
+
+      for (let i = 0; i < lines.length; i++) {
+        const header = lines[i];
+        const sep = lines[i + 1];
+        if (sep != null && header.includes('|') && isSeparatorLine(sep)) {
+          const rows = [parseRow(header)];
+          i += 2;
+          while (i < lines.length && lines[i].includes('|') && lines[i].trim() !== '') {
+            rows.push(parseRow(lines[i]));
+            i++;
+          }
+          i--; // compensate for loop increment
+
+          const colCount = Math.max(...rows.map(r => r.length));
+          const widths = Array.from({ length: colCount }, (_, c) => {
+            return Math.max(...rows.map(r => (r[c] ?? '').length));
+          });
+
+          const formatted = rows.map((r, idx) => {
+            const cells = [];
+            for (let c = 0; c < colCount; c++) {
+              const cell = (r[c] ?? '');
+              const pad = ' '.repeat(Math.max(0, widths[c] - cell.length));
+              cells.push(cell + pad);
+            }
+            const line = cells.join(' | ');
+            if (idx === 0) {
+              const rule = widths.map(w => '-'.repeat(Math.max(3, w))).join('-|-');
+              return [line, rule];
+            }
+            return [line];
+          }).flat();
+
+          out.push(...formatted);
+
+          // If we stopped because of blank line, keep it.
+          if (lines[i + 1] === '') out.push('');
+          continue;
+        }
+
+        out.push(lines[i]);
+      }
+
+      return out.join('\n');
+    }
+
+    function convertLinks(md) {
+      // [text](url) => text (url)
+      return md.replace(/\[([^\]]+?)\]\(([^\s)]+(?:\s+\"[^\"]*\")?)\)/g, (m, text, urlPart) => {
+        // Strip optional title if present after URL
+        const url = String(urlPart).split(/\s+\"/)[0];
+        return `${text} (${url})`;
+      });
+    }
+
+    function protectCodeSpans(md) {
+      // Replace `code` spans with tokens so emphasis parsing won't touch them.
+      const tokens = [];
+      const out = md.replace(/`([^`\n]+?)`/g, (m, code) => {
+        const id = tokens.length;
+        tokens.push(code);
+        return `\uE000CODE${id}\uE000`;
+      });
+      return { out, tokens };
+    }
+
+    function restoreCodeSpans(text, tokens) {
+      return text.replace(/\uE000CODE(\d+)\uE000/g, (m, id) => {
+        const code = tokens[Number(id)] ?? '';
+        return stylize(STYLE.MONO, code);
+      });
+    }
+
+    function applyEmphasis(md) {
+      // Order matters.
+      let s = md;
+
+      // Bold+Italic: ***text*** or ___text___
+      s = s.replace(/\*\*\*([\s\S]+?)\*\*\*/g, (m, inner) => stylize(STYLE.BOLD_ITALIC, inner));
+      s = s.replace(/___([\s\S]+?)___/g, (m, inner) => stylize(STYLE.BOLD_ITALIC, inner));
+
+      // Bold: **text** or __text__
+      s = s.replace(/\*\*([\s\S]+?)\*\*/g, (m, inner) => stylize(STYLE.BOLD, inner));
+      s = s.replace(/__([\s\S]+?)__/g, (m, inner) => stylize(STYLE.BOLD, inner));
+
+      // Italic: *text* or _text_
+      // Keep it conservative to avoid eating bullet markers; require non-space at start/end.
+      s = s.replace(/(^|[^*])\*([^\s][\s\S]*?[^\s])\*(?!\*)/g, (m, pre, inner) => pre + stylize(STYLE.ITALIC, inner));
+      s = s.replace(/(^|[^_])_([^\s][\s\S]*?[^\s])_(?!_)/g, (m, pre, inner) => pre + stylize(STYLE.ITALIC, inner));
+
+      return s;
+    }
+
+    function applyStrike(md) {
+      return md.replace(/~~([\s\S]+?)~~/g, (m, inner) => strike(inner));
+    }
+
+    function cleanup(md) {
+      // Remove any remaining markdown markers that we didn't convert.
+      // (We keep things conservative so we don't accidentally remove intended characters.)
+      return md
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/[ \t]+\n/g, '\n');
+    }
+
+    function mdToLinkedInUnicode(md, opts) {
+      let s = md;
+
+      // 1) Protect fenced code blocks and inline code before any other pass.
+      const fenced = protectFencedCodeBlocks(s);
+      s = fenced.out;
+
+      // 2) Tables to readable text (works best before emphasis).
+      s = convertTables(s);
+
+      // 3) Headings/bullets normalization.
+      s = normalizeLines(s, opts);
+      s = convertLinks(s);
+
+      const protectedCode = protectCodeSpans(s);
+      s = protectedCode.out;
+
+      s = applyStrike(s);
+      s = applyEmphasis(s);
+
+      s = restoreCodeSpans(s, protectedCode.tokens);
+      s = restoreFencedCodeBlocks(s, fenced.tokens);
+      s = cleanup(s);
+
+      return s;
+    }
+
+    // --- UI wiring ---
+
+    const elMd = document.getElementById('md');
+    const elOut = document.getElementById('out');
+    const elStatus = document.getElementById('status');
+    const elMdCount = document.getElementById('mdCount');
+
+    const btnCopy = document.getElementById('btnCopy');
+    const btnSelect = document.getElementById('btnSelect');
+    const btnClear = document.getElementById('btnClear');
+    const btnExample = document.getElementById('btnExample');
+    const btnDownload = document.getElementById('btnDownload');
+    const btnConvert = document.getElementById('btnConvert');
+    const toggleAuto = document.getElementById('toggleAuto');
+    const btnGuide = document.getElementById('btnGuide');
+    const dlgGuide = document.getElementById('dlgGuide');
+    const btnCloseGuide = document.getElementById('btnCloseGuide');
+    const bulletStyle = document.getElementById('bulletStyle');
+
+    const tbBold = document.getElementById('tbBold');
+    const tbItalic = document.getElementById('tbItalic');
+    const tbStrike = document.getElementById('tbStrike');
+    const tbLink = document.getElementById('tbLink');
+    const tbBullets = document.getElementById('tbBullets');
+    const tbNumbered = document.getElementById('tbNumbered');
+    const tbQuote = document.getElementById('tbQuote');
+    const tbCode = document.getElementById('tbCode');
+    const tbUndo = document.getElementById('tbUndo');
+    const tbRedo = document.getElementById('tbRedo');
+
+    const EXAMPLE = `# Launching something new\n\nHey everyone — I’m excited to share: **MD → LinkedIn formatter**.\n\nUse *italic* for emphasis, **bold** for punch, and ***both*** for drama.\n\nCode-y bits: \`npm run build\`\n\n- Fast\n- Simple\n- Copy/paste friendly\n\n~~This line is struck~~ but we move on.\n\n[My site](https://example.com)`;
+
+    function setStatus(html) {
+      elStatus.innerHTML = html;
+    }
+
+    function updateMdCount() {
+      if (!elMdCount) return;
+      const len = (elMd?.value ?? '').length;
+      elMdCount.innerHTML = `<strong>${len}</strong> characters`;
+    }
+
+    const LIMIT_POST = 3000;
+
+    function getOpts() {
+      return {
+        bulletChar: bulletStyle?.value ?? '•',
+      };
+    }
+
+    function renderStatus(output) {
+      const len = output.length;
+      const over = len > LIMIT_POST;
+
+      const parts = [];
+      parts.push(`Characters: <strong>${len}</strong> / ${LIMIT_POST}`);
+
+      if (over) {
+        parts.push(`<span class="hint" style="color: color-mix(in srgb, var(--danger) 80%, var(--text));">• Over limit by ${len - LIMIT_POST}</span>`);
+      }
+
+      setStatus(parts.join(' '));
+    }
+
+    function convertNow() {
+      const input = elMd.value ?? '';
+      const output = mdToLinkedInUnicode(input, getOpts());
+      elOut.value = output;
+      renderStatus(output);
+    }
+
+    function replaceSelection(textarea, replacement, selectFrom, selectTo) {
+      const start = textarea.selectionStart ?? 0;
+      const end = textarea.selectionEnd ?? start;
+      textarea.setRangeText(replacement, start, end, 'end');
+      if (typeof selectFrom === 'number' && typeof selectTo === 'number') {
+        textarea.setSelectionRange(selectFrom, selectTo);
+      }
+    }
+
+    function wrapSelection(textarea, before, after, placeholder) {
+      const start = textarea.selectionStart ?? 0;
+      const end = textarea.selectionEnd ?? start;
+      const selected = textarea.value.slice(start, end);
+      const inner = selected || (placeholder ?? 'text');
+      const replacement = before + inner + after;
+      replaceSelection(textarea, replacement);
+
+      // If we inserted placeholder (no prior selection), select it for easy overwrite.
+      if (!selected && placeholder != null) {
+        const selStart = start + before.length;
+        const selEnd = selStart + inner.length;
+        textarea.setSelectionRange(selStart, selEnd);
+      }
+    }
+
+    function countRepeatBefore(value, index, ch) {
+      let n = 0;
+      for (let i = index - 1; i >= 0; i--) {
+        if (value[i] !== ch) break;
+        n++;
+      }
+      return n;
+    }
+
+    function countRepeatAfter(value, index, ch) {
+      let n = 0;
+      for (let i = index; i < value.length; i++) {
+        if (value[i] !== ch) break;
+        n++;
+      }
+      return n;
+    }
+
+    function countRunAtStart(str, ch) {
+      let n = 0;
+      while (n < str.length && str[n] === ch) n++;
+      return n;
+    }
+
+    function countRunAtEnd(str, ch) {
+      let n = 0;
+      while (n < str.length && str[str.length - 1 - n] === ch) n++;
+      return n;
+    }
+
+    function toggleRepeatedMarker(textarea, ch, unit, mode, placeholder) {
+      // Toggle wrappers made of repeated `ch` around selection.
+      // - bold: ch='*', unit=2, mode='removeIfAtLeastUnit'
+      // - italic: ch='*', unit=1, mode='toggleOdd'
+      // - strike: ch='~', unit=2, mode='removeIfAtLeastUnit'
+      const value = textarea.value;
+      const start = textarea.selectionStart ?? 0;
+      const end = textarea.selectionEnd ?? start;
+
+      if (start === end) {
+        const marker = ch.repeat(unit);
+        wrapSelection(textarea, marker, marker, placeholder);
+        return;
+      }
+
+      const selected = value.slice(start, end);
+      const leadInside = countRunAtStart(selected, ch);
+      const trailInside = countRunAtEnd(selected, ch);
+      const nInside = Math.min(leadInside, trailInside);
+
+      const beforeRun = countRepeatBefore(value, start, ch);
+      const afterRun = countRepeatAfter(value, end, ch);
+      const nOutside = Math.min(beforeRun, afterRun);
+
+      function shouldRemove(n) {
+        if (mode === 'toggleOdd') return (n % 2) === 1;
+        // default: remove when there are at least `unit` markers present
+        return n >= unit;
+      }
+
+      const hasInside = nInside > 0;
+      const hasOutside = !hasInside && nOutside > 0;
+      const n = hasInside ? nInside : (hasOutside ? nOutside : 0);
+
+      if (n > 0 && shouldRemove(n)) {
+        const removeCount = mode === 'toggleOdd' ? 1 : unit;
+        if (n >= removeCount) {
+          if (hasInside) {
+            const inner = selected.slice(removeCount, selected.length - removeCount);
+            textarea.setRangeText(inner, start, end, 'select');
+            textarea.setSelectionRange(start, start + inner.length);
+            return;
+          }
+
+          // Remove markers adjacent outside selection.
+          textarea.setRangeText('', end, end + removeCount, 'preserve');
+          textarea.setRangeText('', start - removeCount, start, 'preserve');
+          textarea.setSelectionRange(start - removeCount, end - removeCount);
+          return;
+        }
+      }
+
+      // Otherwise: add markers.
+      const addCount = unit;
+      const marker = ch.repeat(addCount);
+
+      if (hasInside) {
+        const replacement = marker + selected + marker;
+        textarea.setRangeText(replacement, start, end, 'select');
+        textarea.setSelectionRange(start + marker.length, start + marker.length + selected.length);
+        return;
+      }
+
+      // Add markers adjacent outside selection.
+      textarea.setRangeText(marker, end, end, 'preserve');
+      textarea.setRangeText(marker, start, start, 'preserve');
+      textarea.setSelectionRange(start + addCount, end + addCount);
+    }
+
+    function prefixLines(textarea, prefix, numbered) {
+      const start = textarea.selectionStart ?? 0;
+      const end = textarea.selectionEnd ?? start;
+      const value = textarea.value;
+
+      const lineStart = value.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
+      const lineEndIdx = value.indexOf('\n', end);
+      const lineEnd = lineEndIdx === -1 ? value.length : lineEndIdx;
+      const block = value.slice(lineStart, lineEnd);
+
+      const lines = block.split('\n');
+      const out = lines.map((ln, i) => {
+        if (ln.trim() === '') return ln;
+        if (numbered) return `${i + 1}. ${ln.replace(/^\s+/, '')}`;
+        return `${prefix}${ln.replace(/^\s+/, '')}`;
+      }).join('\n');
+
+      textarea.setSelectionRange(lineStart, lineEnd);
+      replaceSelection(textarea, out);
+      textarea.setSelectionRange(lineStart, lineStart + out.length);
+    }
+
+    function insertCode(textarea) {
+      const start = textarea.selectionStart ?? 0;
+      const end = textarea.selectionEnd ?? start;
+      const selected = textarea.value.slice(start, end);
+      const hasNewline = selected.includes('\n');
+      if (hasNewline) {
+        const inner = selected || 'code';
+        const replacement = `\n\n\
+\`\`\`\n${inner.replace(/\n+$/g, '')}\n\`\`\`\n\n`;
+        replaceSelection(textarea, replacement);
+      } else {
+        wrapSelection(textarea, '`', '`', 'code');
+      }
+    }
+
+    function insertLinkAtSelection(textarea) {
+      const start = textarea.selectionStart ?? 0;
+      const end = textarea.selectionEnd ?? start;
+      const selected = textarea.value.slice(start, end).trim();
+
+      const looksLikeUrl = /^https?:\/\//i.test(selected) && !/\s/.test(selected);
+      const text = looksLikeUrl ? 'link text' : (selected || 'link text');
+      const url = looksLikeUrl ? selected : 'https://example.com';
+
+      const replacement = `[${text}](${url})`;
+      replaceSelection(textarea, replacement);
+
+      // Select the most likely field the user wants to edit.
+      if (looksLikeUrl) {
+        const selStart = start + 1;
+        const selEnd = selStart + text.length;
+        textarea.setSelectionRange(selStart, selEnd);
+      } else {
+        const urlStart = start + replacement.lastIndexOf('(') + 1;
+        const urlEnd = urlStart + url.length;
+        textarea.setSelectionRange(urlStart, urlEnd);
+      }
+    }
+
+    function doUndoRedo(kind) {
+      elMd.focus();
+      try {
+        // Deprecated but still widely supported for textarea undo/redo.
+        document.execCommand(kind);
+      } catch {
+        // No-op: browser doesn't allow programmatic undo/redo.
+      }
+    }
+
+    function downloadOutput() {
+      const text = elOut.value;
+      if (!text) {
+        setStatus('Nothing to download.');
+        return;
+      }
+
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'linkedin-post.txt';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setStatus('Downloaded.');
+    }
+
+    async function copyOutput() {
+      const text = elOut.value;
+      if (!text) {
+        setStatus('Nothing to copy.');
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        setStatus('Copied to clipboard.');
+      } catch {
+        // Fallback
+        elOut.focus();
+        elOut.select();
+        try {
+          document.execCommand('copy');
+          setStatus('Copied (fallback).');
+        } catch {
+          setStatus('Copy failed — select the text and copy manually.');
+        }
+      }
+    }
+
+    function isAuto() {
+      return !!toggleAuto?.checked;
+    }
+
+    elMd.addEventListener('input', () => {
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    // Toolbar actions
+    tbBold?.addEventListener('click', () => {
+      elMd.focus();
+      toggleRepeatedMarker(elMd, '*', 2, 'removeIfAtLeastUnit', 'bold');
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbItalic?.addEventListener('click', () => {
+      elMd.focus();
+      toggleRepeatedMarker(elMd, '*', 1, 'toggleOdd', 'italic');
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbStrike?.addEventListener('click', () => {
+      elMd.focus();
+      toggleRepeatedMarker(elMd, '~', 2, 'removeIfAtLeastUnit', 'strike');
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbLink?.addEventListener('click', () => {
+      elMd.focus();
+      insertLinkAtSelection(elMd);
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbBullets?.addEventListener('click', () => {
+      elMd.focus();
+      prefixLines(elMd, '- ', false);
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbNumbered?.addEventListener('click', () => {
+      elMd.focus();
+      prefixLines(elMd, '', true);
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbQuote?.addEventListener('click', () => {
+      elMd.focus();
+      prefixLines(elMd, '> ', false);
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbCode?.addEventListener('click', () => {
+      elMd.focus();
+      insertCode(elMd);
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbUndo?.addEventListener('click', () => {
+      doUndoRedo('undo');
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    tbRedo?.addEventListener('click', () => {
+      doUndoRedo('redo');
+      updateMdCount();
+      if (isAuto()) convertNow();
+    });
+
+    function insertAtCursor(textarea, text) {
+      const start = textarea.selectionStart ?? textarea.value.length;
+      const end = textarea.selectionEnd ?? textarea.value.length;
+      const before = textarea.value.slice(0, start);
+      const after = textarea.value.slice(end);
+      textarea.value = before + text + after;
+      const newPos = start + text.length;
+      textarea.setSelectionRange(newPos, newPos);
+    }
+
+    function htmlToMarkdown(html) {
+      // Lightweight HTML → Markdown converter for common clipboard sources.
+      // Focus: paragraphs, line breaks, strong/em, links, lists, code/pre.
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+
+      function textOf(node) {
+        return (node.textContent ?? '').replace(/\u00A0/g, ' ');
+      }
+
+      function walk(node, inPre) {
+        if (!node) return '';
+        if (node.nodeType === Node.TEXT_NODE) {
+          return inPre ? node.nodeValue ?? '' : (node.nodeValue ?? '').replace(/\s+/g, ' ');
+        }
+        if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+        const el = node;
+        const tag = el.tagName.toLowerCase();
+
+        // Remove scripts/styles.
+        if (tag === 'script' || tag === 'style') return '';
+
+        if (tag === 'br') return '\n';
+
+        if (tag === 'p' || tag === 'div') {
+          const inner = Array.from(el.childNodes).map(n => walk(n, false)).join('');
+          return inner.trim() ? inner.trim() + '\n\n' : '';
+        }
+
+        if (tag === 'strong' || tag === 'b') {
+          const inner = Array.from(el.childNodes).map(n => walk(n, inPre)).join('');
+          return `**${inner}**`;
+        }
+
+        if (tag === 'em' || tag === 'i') {
+          const inner = Array.from(el.childNodes).map(n => walk(n, inPre)).join('');
+          return `*${inner}*`;
+        }
+
+        if (tag === 's' || tag === 'del' || tag === 'strike') {
+          const inner = Array.from(el.childNodes).map(n => walk(n, inPre)).join('');
+          return `~~${inner}~~`;
+        }
+
+        if (tag === 'code' && !inPre) {
+          const inner = textOf(el);
+          return '`' + inner.replace(/`/g, '\\`') + '`';
+        }
+
+        if (tag === 'pre') {
+          // Prefer nested code, but fall back to textContent.
+          const codeEl = el.querySelector('code');
+          const content = (codeEl ? textOf(codeEl) : textOf(el)).replace(/\n+$/g, '');
+          return '\n\n```\n' + content + '\n```\n\n';
+        }
+
+        if (tag === 'a') {
+          const href = el.getAttribute('href') || '';
+          const inner = Array.from(el.childNodes).map(n => walk(n, inPre)).join('').trim() || href;
+          if (!href) return inner;
+          return `[${inner}](${href})`;
+        }
+
+        if (tag === 'ul') {
+          const items = Array.from(el.children).filter(c => c.tagName?.toLowerCase() === 'li');
+          const md = items.map(li => `- ${walk(li, false).trim()}`).join('\n');
+          return md + '\n\n';
+        }
+
+        if (tag === 'ol') {
+          const items = Array.from(el.children).filter(c => c.tagName?.toLowerCase() === 'li');
+          const md = items.map((li, i) => `${i + 1}. ${walk(li, false).trim()}`).join('\n');
+          return md + '\n\n';
+        }
+
+        if (tag === 'li') {
+          // li content may contain nested lists
+          const inner = Array.from(el.childNodes).map(n => walk(n, false)).join('');
+          return inner.replace(/\n\n+/g, '\n').trim();
+        }
+
+        if (tag === 'table') {
+          // Convert HTML table to Markdown pipe table.
+          const rows = Array.from(el.querySelectorAll('tr'));
+          const grid = rows.map(tr => Array.from(tr.querySelectorAll('th,td')).map(c => textOf(c).trim()));
+          if (grid.length === 0) return '';
+          const header = grid[0];
+          const sep = header.map(() => '---');
+          const lines = [];
+          lines.push('| ' + header.join(' | ') + ' |');
+          lines.push('| ' + sep.join(' | ') + ' |');
+          for (let r = 1; r < grid.length; r++) {
+            lines.push('| ' + grid[r].join(' | ') + ' |');
+          }
+          return lines.join('\n') + '\n\n';
+        }
+
+        // Default: recurse.
+        return Array.from(el.childNodes).map(n => walk(n, inPre)).join('');
+      }
+
+      const md = walk(doc.body, false)
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
+      return md;
+    }
+
+    elMd.addEventListener('paste', (e) => {
+      const html = e.clipboardData?.getData('text/html');
+      if (!html) return;
+
+      const md = htmlToMarkdown(html);
+      if (!md) return;
+
+      // If it's basically the same as plain text, don't interfere.
+      const plain = (e.clipboardData?.getData('text/plain') ?? '').trim();
+      if (plain && (plain === md || plain.replace(/\s+/g, ' ') === md.replace(/\s+/g, ' '))) {
+        return;
+      }
+
+      e.preventDefault();
+      insertAtCursor(elMd, md);
+      if (isAuto()) convertNow();
+      setStatus('Pasted rich text → converted to Markdown.');
+    });
+
+    btnCopy.addEventListener('click', copyOutput);
+
+    btnSelect.addEventListener('click', () => {
+      elOut.focus();
+      elOut.select();
+      setStatus('Selected output.');
+    });
+
+    btnDownload.addEventListener('click', downloadOutput);
+
+    btnConvert.addEventListener('click', () => {
+      convertNow();
+      setStatus('Converted.');
+    });
+
+    toggleAuto.addEventListener('change', () => {
+      if (isAuto()) {
+        convertNow();
+        setStatus('Auto: on');
+      } else {
+        setStatus('Auto: off (click Convert)');
+      }
+    });
+
+    bulletStyle.addEventListener('change', () => {
+      convertNow();
+      setStatus(`Bullets: ${bulletStyle.value}`);
+    });
+
+    btnGuide.addEventListener('click', () => {
+      dlgGuide?.showModal();
+    });
+
+    btnCloseGuide.addEventListener('click', () => dlgGuide?.close());
+
+    dlgGuide.addEventListener('cancel', (e) => {
+      // Keep default Esc-to-close behavior, but we can add custom logic later.
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const mod = e.metaKey || e.ctrlKey;
+
+      if (e.key === 'Escape' && dlgGuide?.open) {
+        dlgGuide.close();
+        return;
+      }
+
+      // Convert shortcut: Cmd/Ctrl + Enter (only when editing Markdown)
+      if (mod && (e.key === 'Enter' || e.code === 'Enter' || e.code === 'NumpadEnter') && e.target === elMd) {
+        e.preventDefault();
+        convertNow();
+        setStatus('Converted.');
+        return;
+      }
+
+      if (mod && e.shiftKey && (e.key.toLowerCase() === 'c')) {
+        e.preventDefault();
+        copyOutput();
+      }
+    });
+
+    btnClear.addEventListener('click', () => {
+      elMd.value = '';
+      convertNow();
+      updateMdCount();
+      elMd.focus();
+      setStatus('Cleared.');
+    });
+
+    btnExample.addEventListener('click', () => {
+      elMd.value = EXAMPLE;
+      convertNow();
+      updateMdCount();
+      elMd.focus();
+      setStatus('Example inserted.');
+    });
+
+    // Initial conversion
+    convertNow();
+    updateMdCount();
+  </script>
+</body>
+</html>

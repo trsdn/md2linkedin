@@ -1,0 +1,28 @@
+# Launching something new
+
+Hey everyone — I’m excited to share a tiny tool I built:
+
+**MD → LinkedIn Unicode Formatter**
+
+It lets you write in Markdown and paste into LinkedIn with:
+
+- *italic* emphasis
+- **bold** highlights
+- ***bold + italic*** for extra punch
+- `monospace` for commands (e.g. `npm run build`)
+- ~~strikethrough~~ for quick edits
+
+## Why this exists
+
+Writing posts is easier in Markdown, but LinkedIn doesn’t support formatting like GitHub does.
+So this uses the “Unicode trick” (mathematical letter variants) to *look* formatted.
+
+## Try it
+
+1. Open the page (`index.html`)
+2. Paste this text into the left textarea
+3. Copy the output on the right and paste into LinkedIn
+
+[Project link](https://example.com)
+
+P.S. If you spot edge cases (nested emphasis, weird underscores), tell me — I’ll improve it.
