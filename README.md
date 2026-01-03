@@ -7,6 +7,7 @@ A tiny, single-page tool that converts Markdown-ish formatting into LinkedIn-rea
 Paste Markdown on the left, copy LinkedIn-ready text on the right.
 
 Supported:
+
 - `**bold**`
 - `*italic*`
 - `***bolditalic***`
@@ -20,6 +21,9 @@ Supported:
 
 Open `index.html` in your browser.
 
+Or use GitHub Pages (after the first deploy completes):
+`https://trsdn.github.io/md2linkedin/`
+
 There’s also a `sample.txt` you can paste into the page to try everything quickly.
 
 ## Notes / caveats
@@ -30,4 +34,4 @@ There’s also a `sample.txt` you can paste into the page to try everything quic
 
 ## License
 
-MIT (add a LICENSE file if you want this explicit in the repo).
+Apache-2.0 (see `LICENSE`).
