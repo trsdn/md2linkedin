@@ -14,6 +14,7 @@
       --accent: #7aa2ff;
       --accent2: #5ef0c2;
       --danger: #ff6b6b;
+      --ctl-h: 40px;
     }
 
     @media (prefers-color-scheme: light) {
@@ -78,6 +79,8 @@
       overflow: hidden;
       box-shadow: 0 14px 40px rgba(0, 0, 0, 0.16);
       backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
     }
 
     .card header {
@@ -107,6 +110,7 @@
       background: transparent;
       color: var(--text);
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      flex: 1 1 auto;
     }
 
     .editorBar {
@@ -203,11 +207,16 @@
       background: color-mix(in srgb, var(--panel) 88%, transparent);
       color: var(--text);
       border-radius: 10px;
-      padding: 10px 12px;
+      height: var(--ctl-h);
+      padding: 0 12px;
       font-size: 13px;
       cursor: pointer;
       transition: transform 0.05s ease, border-color 0.15s ease, background 0.15s ease;
       user-select: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     button:hover { border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); }
@@ -250,6 +259,12 @@
       color: var(--muted);
     }
 
+    .toolbar .pill {
+      height: var(--ctl-h);
+      padding: 0 12px;
+      gap: 10px;
+    }
+
     .pill input[type="checkbox"] {
       width: 16px;
       height: 16px;
@@ -261,7 +276,8 @@
       background: color-mix(in srgb, var(--panel) 88%, transparent);
       color: var(--text);
       border-radius: 10px;
-      padding: 9px 10px;
+      height: calc(var(--ctl-h) - 6px);
+      padding: 0 10px;
       font-size: 13px;
       outline: none;
     }
@@ -406,7 +422,7 @@
           <button id="btnGuide">Guide</button>
         </div>
         <div class="right">
-          <label class="pill" style="padding: 7px 10px; gap: 10px;">
+          <label class="pill">
             <span>Bullets</span>
             <select id="bulletStyle" aria-label="Bullet style">
               <option value="•">•</option>
@@ -416,7 +432,7 @@
               <option value="➤">➤</option>
             </select>
           </label>
-          <label class="pill" style="padding: 7px 10px; gap: 10px;">
+          <label class="pill">
             <span>Auto</span>
             <input id="toggleAuto" type="checkbox" checked aria-label="Auto convert" />
           </label>
@@ -884,6 +900,105 @@
       }
     }
 
+    function countRepeatBefore(value, index, ch) {
+      let n = 0;
+      for (let i = index - 1; i >= 0; i--) {
+        if (value[i] !== ch) break;
+        n++;
+      }
+      return n;
+    }
+
+    function countRepeatAfter(value, index, ch) {
+      let n = 0;
+      for (let i = index; i < value.length; i++) {
+        if (value[i] !== ch) break;
+        n++;
+      }
+      return n;
+    }
+
+    function countRunAtStart(str, ch) {
+      let n = 0;
+      while (n < str.length && str[n] === ch) n++;
+      return n;
+    }
+
+    function countRunAtEnd(str, ch) {
+      let n = 0;
+      while (n < str.length && str[str.length - 1 - n] === ch) n++;
+      return n;
+    }
+
+    function toggleRepeatedMarker(textarea, ch, unit, mode, placeholder) {
+      // Toggle wrappers made of repeated `ch` around selection.
+      // - bold: ch='*', unit=2, mode='removeIfAtLeastUnit'
+      // - italic: ch='*', unit=1, mode='toggleOdd'
+      // - strike: ch='~', unit=2, mode='removeIfAtLeastUnit'
+      const value = textarea.value;
+      const start = textarea.selectionStart ?? 0;
+      const end = textarea.selectionEnd ?? start;
+
+      if (start === end) {
+        const marker = ch.repeat(unit);
+        wrapSelection(textarea, marker, marker, placeholder);
+        return;
+      }
+
+      const selected = value.slice(start, end);
+      const leadInside = countRunAtStart(selected, ch);
+      const trailInside = countRunAtEnd(selected, ch);
+      const nInside = Math.min(leadInside, trailInside);
+
+      const beforeRun = countRepeatBefore(value, start, ch);
+      const afterRun = countRepeatAfter(value, end, ch);
+      const nOutside = Math.min(beforeRun, afterRun);
+
+      function shouldRemove(n) {
+        if (mode === 'toggleOdd') return (n % 2) === 1;
+        // default: remove when there are at least `unit` markers present
+        return n >= unit;
+      }
+
+      const hasInside = nInside > 0;
+      const hasOutside = !hasInside && nOutside > 0;
+      const n = hasInside ? nInside : (hasOutside ? nOutside : 0);
+
+      if (n > 0 && shouldRemove(n)) {
+        const removeCount = mode === 'toggleOdd' ? 1 : unit;
+        if (n >= removeCount) {
+          if (hasInside) {
+            const inner = selected.slice(removeCount, selected.length - removeCount);
+            textarea.setRangeText(inner, start, end, 'select');
+            textarea.setSelectionRange(start, start + inner.length);
+            return;
+          }
+
+          // Remove markers adjacent outside selection.
+          textarea.setRangeText('', end, end + removeCount, 'preserve');
+          textarea.setRangeText('', start - removeCount, start, 'preserve');
+          textarea.setSelectionRange(start - removeCount, end - removeCount);
+          return;
+        }
+      }
+
+      // Otherwise: add markers.
+      const addCount = unit;
+      const marker = ch.repeat(addCount);
+
+      if (hasInside) {
+        const replacement = marker + selected + marker;
+        textarea.setRangeText(replacement, start, end, 'select');
+        textarea.setSelectionRange(start + marker.length, start + marker.length + selected.length);
+        return;
+      }
+
+      // Add markers adjacent outside selection.
+      textarea.setRangeText(marker, end, end, 'preserve');
+      textarea.setRangeText(marker, start, start, 'preserve');
+      textarea.setSelectionRange(start + addCount, end + addCount);
+    }
+
     function prefixLines(textarea, prefix, numbered) {
       const start = textarea.selectionStart ?? 0;
       const end = textarea.selectionEnd ?? start;
@@ -1009,21 +1124,21 @@
     // Toolbar actions
     tbBold?.addEventListener('click', () => {
       elMd.focus();
-      wrapSelection(elMd, '**', '**', 'bold');
+      toggleRepeatedMarker(elMd, '*', 2, 'removeIfAtLeastUnit', 'bold');
       updateMdCount();
       if (isAuto()) convertNow();
     });
 
     tbItalic?.addEventListener('click', () => {
       elMd.focus();
-      wrapSelection(elMd, '*', '*', 'italic');
+      toggleRepeatedMarker(elMd, '*', 1, 'toggleOdd', 'italic');
       updateMdCount();
       if (isAuto()) convertNow();
     });
 
     tbStrike?.addEventListener('click', () => {
       elMd.focus();
-      wrapSelection(elMd, '~~', '~~', 'strike');
+      toggleRepeatedMarker(elMd, '~', 2, 'removeIfAtLeastUnit', 'strike');
       updateMdCount();
       if (isAuto()) convertNow();
     });
