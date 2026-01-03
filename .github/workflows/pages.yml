@@ -26,11 +26,19 @@ jobs:
         uses: actions/configure-pages@v5
 
       # No build step needed: this repo is a static single-file app.
-      # Upload the site root as the Pages artifact.
+      # Prepare a minimal publish directory so we don't upload the entire repo.
+      - name: Prepare site
+        run: |
+          mkdir -p site
+          cp index.html site/
+          if [ -f sample.txt ]; then cp sample.txt site/; fi
+          # Avoid Jekyll processing (not required, but harmless).
+          touch site/.nojekyll
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: site
 
       - name: Deploy to GitHub Pages
         id: deployment
