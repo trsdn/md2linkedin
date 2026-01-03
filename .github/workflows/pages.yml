@@ -24,6 +24,8 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       # No build step needed: this repo is a static single-file app.
       # Prepare a minimal publish directory so we don't upload the entire repo.
