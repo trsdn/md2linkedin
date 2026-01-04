@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://trsdn.github.io/md2linkedin/sitemap.xml
