@@ -37,7 +37,7 @@ Open `index.html` in your browser.
 Or use GitHub Pages:
 <https://trsdn.github.io/md2linkedin/>
 
-There’s also a `sample.txt` you can paste into the page to try everything quickly.
+Tip: click “Insert example” on the page to paste a ready-to-go sample post.
 
 ## Notes / caveats
 
