@@ -1,44 +1,252 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="night">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MD → LinkedIn Unicode Formatter</title>
+  <title>Markdown → LinkedIn Unicode Formatter</title>
   <style>
     :root {
       --bg: #0b1220;
+      --page-bg: var(--bg);
       --panel: #0f1a2e;
       --text: #e8eefc;
       --muted: #a8b3cf;
       --border: rgba(232, 238, 252, 0.14);
+
       --accent: #7aa2ff;
+      --accent-hi: #8ab0ff;
+      --accent-rgb: 122 162 255;
       --accent2: #5ef0c2;
       --danger: #ff6b6b;
+      --danger-rgb: 255 107 107;
+
+      --ui-surface: rgba(255, 255, 255, 0.035);
+      --ui-surface-2: rgba(255, 255, 255, 0.03);
+      --ui-hover-border: rgb(var(--accent-rgb) / 0.45);
+      --ui-hover-bg: rgb(var(--accent-rgb) / 0.10);
+      --focus-ring: rgb(var(--accent-rgb) / 0.62);
+
+      --placeholder: rgba(168, 179, 207, 0.72);
       --ctl-h: 40px;
+
+      --radius: 14px;
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.10);
+      --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.08);
+
+      --grain-a: rgba(27, 27, 22, 0.055);
+      --grain-b: rgba(27, 27, 22, 0.03);
+      --grain-c: rgba(27, 27, 22, 0.02);
+
+      --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      --font-serif: ui-serif, "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, Times, serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    /* Theme presets (no external dependencies) */
+
+    html[data-theme="night"] {
+      --bg: #0b1220;
+      --page-bg:
+        radial-gradient(1000px 700px at 20% 10%, rgba(122, 162, 255, 0.22), transparent 60%),
+        radial-gradient(900px 650px at 90% 20%, rgba(94, 240, 194, 0.18), transparent 55%),
+        var(--bg);
+      --panel: #0f1a2e;
+      --text: #e8eefc;
+      --muted: #a8b3cf;
+      --border: rgba(232, 238, 252, 0.14);
+
+      --accent: #7aa2ff;
+      --accent-hi: #8ab0ff;
+      --accent-rgb: 122 162 255;
+      --accent2: #5ef0c2;
+      --danger: #ff6b6b;
+      --danger-rgb: 255 107 107;
+
+      --ui-surface: rgba(15, 26, 46, 0.55);
+      --ui-surface-2: rgba(15, 26, 46, 0.42);
+      --ui-hover-border: rgb(var(--accent-rgb) / 0.50);
+      --ui-hover-bg: rgb(var(--accent-rgb) / 0.12);
+      --focus-ring: rgb(var(--accent-rgb) / 0.62);
+
+      --placeholder: rgba(168, 179, 207, 0.72);
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.40);
+      --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.32);
     }
 
     @media (prefers-color-scheme: light) {
-      :root {
+      html[data-theme="night"] {
         --bg: #f6f7fb;
+        --page-bg: var(--bg);
         --panel: #ffffff;
         --text: #0b1220;
         --muted: #4c566a;
         --border: rgba(11, 18, 32, 0.14);
         --accent: #2f62ff;
+        --accent-hi: #3a6cff;
+        --accent-rgb: 47 98 255;
         --accent2: #0bbf8a;
         --danger: #d64545;
+        --danger-rgb: 214 69 69;
+        --ui-surface: rgba(255, 255, 255, 0.74);
+        --ui-surface-2: rgba(255, 255, 255, 0.62);
+        --ui-hover-border: rgb(var(--accent-rgb) / 0.38);
+        --ui-hover-bg: rgb(var(--accent-rgb) / 0.06);
+        --focus-ring: rgb(var(--accent-rgb) / 0.55);
+        --placeholder: rgba(76, 86, 106, 0.66);
+        --shadow: 0 22px 70px rgba(0, 0, 0, 0.14);
+        --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.10);
+      }
+    }
+
+    html[data-theme="paper"] {
+      --bg: #f3efe6;
+      --page-bg: var(--bg);
+      --panel: #fbf7f0;
+      --text: #1b1b16;
+      --muted: #5a564e;
+      --border: rgba(27, 27, 22, 0.12);
+      --accent: #1f4ed8;
+      --accent-hi: #2a5ff0;
+      --accent-rgb: 31 78 216;
+      --accent2: #0f766e;
+      --danger: #b42318;
+      --danger-rgb: 180 35 24;
+      --ui-surface: rgba(0, 0, 0, 0.02);
+      --ui-surface-2: rgba(0, 0, 0, 0.02);
+      --ui-hover-border: rgb(var(--accent-rgb) / 0.38);
+      --ui-hover-bg: rgb(var(--accent-rgb) / 0.06);
+      --focus-ring: rgb(var(--accent-rgb) / 0.55);
+      --placeholder: rgba(90, 86, 78, 0.72);
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.10);
+      --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.08);
+      --grain-a: rgba(27, 27, 22, 0.055);
+      --grain-b: rgba(27, 27, 22, 0.03);
+      --grain-c: rgba(27, 27, 22, 0.02);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      html[data-theme="paper"] {
+        --bg: #0e0b07;
+        --page-bg: var(--bg);
+        --panel: #17120c;
+        --text: #f4f0e8;
+        --muted: #b9b2a5;
+        --border: rgba(244, 240, 232, 0.15);
+        --accent: #86a7ff;
+        --accent-hi: #9bb6ff;
+        --accent-rgb: 134 167 255;
+        --accent2: #4bd6c2;
+        --danger: #ff6b6b;
+        --danger-rgb: 255 107 107;
+        --ui-surface: rgba(255, 255, 255, 0.035);
+        --ui-surface-2: rgba(255, 255, 255, 0.03);
+        --ui-hover-border: rgb(var(--accent-rgb) / 0.45);
+        --ui-hover-bg: rgb(var(--accent-rgb) / 0.10);
+        --focus-ring: rgb(var(--accent-rgb) / 0.62);
+        --placeholder: rgba(185, 178, 165, 0.66);
+        --shadow: 0 22px 70px rgba(0, 0, 0, 0.40);
+        --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.32);
+        --grain-a: rgba(244, 240, 232, 0.06);
+        --grain-b: rgba(244, 240, 232, 0.03);
+        --grain-c: rgba(244, 240, 232, 0.02);
+      }
+    }
+
+    html[data-theme="mono"] {
+      --bg: #f6f4ef;
+      --page-bg: var(--bg);
+      --panel: #ffffff;
+      --text: #101010;
+      --muted: rgba(16, 16, 16, 0.62);
+      --border: rgba(16, 16, 16, 0.16);
+      --accent: #111111;
+      --accent-hi: #000000;
+      --accent-rgb: 16 16 16;
+      --accent2: rgba(16, 16, 16, 0.82);
+      --danger: #7a0000;
+      --danger-rgb: 122 0 0;
+      --ui-surface: rgba(16, 16, 16, 0.03);
+      --ui-surface-2: rgba(16, 16, 16, 0.03);
+      --ui-hover-border: rgba(16, 16, 16, 0.35);
+      --ui-hover-bg: rgba(16, 16, 16, 0.06);
+      --focus-ring: rgba(16, 16, 16, 0.65);
+      --placeholder: rgba(16, 16, 16, 0.40);
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.12);
+      --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.09);
+      --grain-a: rgba(16, 16, 16, 0.035);
+      --grain-b: rgba(16, 16, 16, 0.02);
+      --grain-c: rgba(16, 16, 16, 0.015);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      html[data-theme="mono"] {
+        --bg: #0c0c0c;
+        --page-bg: var(--bg);
+        --panel: #121212;
+        --text: #f2f2f2;
+        --muted: rgba(242, 242, 242, 0.70);
+        --border: rgba(242, 242, 242, 0.16);
+        --accent: #f2f2f2;
+        --accent-hi: #ffffff;
+        --accent-rgb: 242 242 242;
+        --accent2: rgba(242, 242, 242, 0.82);
+        --danger: #ff6b6b;
+        --danger-rgb: 255 107 107;
+        --ui-surface: rgba(255, 255, 255, 0.04);
+        --ui-surface-2: rgba(255, 255, 255, 0.03);
+        --ui-hover-border: rgba(255, 255, 255, 0.24);
+        --ui-hover-bg: rgba(255, 255, 255, 0.06);
+        --focus-ring: rgba(255, 255, 255, 0.42);
+        --placeholder: rgba(242, 242, 242, 0.42);
+        --shadow: 0 22px 70px rgba(0, 0, 0, 0.45);
+        --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.32);
+        --grain-a: rgba(242, 242, 242, 0.045);
+        --grain-b: rgba(242, 242, 242, 0.03);
+        --grain-c: rgba(242, 242, 242, 0.02);
       }
     }
 
     * { box-sizing: border-box; }
+    html { background: var(--bg); }
     body {
       margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: radial-gradient(1000px 700px at 20% 10%, rgba(122, 162, 255, 0.22), transparent 60%),
-                  radial-gradient(900px 650px at 90% 20%, rgba(94, 240, 194, 0.18), transparent 55%),
-                  var(--bg);
+      font-family: var(--font-sans);
+      background: var(--page-bg, var(--bg));
       color: var(--text);
       min-height: 100vh;
+      position: relative;
+    }
+
+    body > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    html[data-theme="paper"] body::before,
+    html[data-theme="mono"] body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.95;
+      background:
+        radial-gradient(1200px 900px at 18% 10%, var(--grain-b), transparent 60%),
+        radial-gradient(900px 700px at 86% 18%, var(--grain-c), transparent 58%),
+        repeating-linear-gradient(0deg, var(--grain-a), var(--grain-a) 1px, transparent 1px, transparent 4px),
+        repeating-linear-gradient(90deg, var(--grain-b), var(--grain-b) 1px, transparent 1px, transparent 6px);
+      mix-blend-mode: multiply;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      html[data-theme="paper"] body::before,
+      html[data-theme="mono"] body::before {
+        mix-blend-mode: screen;
+      }
+    }
+
+    ::selection {
+      background: rgb(var(--accent-rgb) / 0.22);
     }
 
     header {
@@ -49,14 +257,17 @@
 
     h1 {
       margin: 0 0 8px;
-      font-size: 22px;
-      letter-spacing: 0.2px;
+      font-family: var(--font-serif);
+      font-size: 28px;
+      letter-spacing: -0.2px;
+      line-height: 1.15;
     }
 
     .sub {
       margin: 0;
       color: var(--muted);
       line-height: 1.45;
+      max-width: 78ch;
     }
 
     .wrap {
@@ -73,12 +284,11 @@
     }
 
     .card {
-      background: color-mix(in srgb, var(--panel) 92%, transparent);
+      background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: var(--radius);
       overflow: hidden;
-      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.16);
-      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
       display: flex;
       flex-direction: column;
     }
@@ -93,7 +303,7 @@
     .card h2 {
       margin: 0;
       font-size: 14px;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--muted);
     }
@@ -109,9 +319,12 @@
       line-height: 1.5;
       background: transparent;
       color: var(--text);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-family: var(--font-mono);
+      caret-color: var(--accent);
       flex: 1 1 auto;
     }
+
+    textarea::placeholder { color: var(--placeholder); }
 
     .editorBar {
       display: flex;
@@ -120,7 +333,7 @@
       gap: 10px;
       padding: 10px 12px;
       border-bottom: 1px solid var(--border);
-      background: color-mix(in srgb, var(--panel) 92%, transparent);
+      background: var(--ui-surface);
     }
 
     .editorBar .group {
@@ -144,9 +357,27 @@
     }
 
     .iconBtn:hover {
-      border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
-      background: color-mix(in srgb, var(--panel) 80%, transparent);
+      border-color: var(--ui-hover-border);
+      background: var(--ui-hover-bg);
     }
+
+    .iconText {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      font-size: 15px;
+      line-height: 1;
+      letter-spacing: 0.2px;
+      font-weight: 700;
+      font-family: var(--font-serif);
+      transform: translateY(-0.5px);
+    }
+
+    .iconText--bold { font-weight: 850; }
+    .iconText--italic { font-style: italic; font-weight: 750; }
+    .iconText--strike { text-decoration: line-through; font-family: var(--font-sans); font-weight: 700; }
 
     .iconBtn:active { transform: translateY(1px); }
 
@@ -171,7 +402,7 @@
 
     .countBadge {
       border: 1px solid var(--border);
-      background: color-mix(in srgb, var(--panel) 88%, transparent);
+      background: var(--ui-surface-2);
       border-radius: 12px;
       padding: 8px 10px;
       font-size: 12px;
@@ -204,7 +435,7 @@
 
     button {
       border: 1px solid var(--border);
-      background: color-mix(in srgb, var(--panel) 88%, transparent);
+      background: var(--ui-surface-2);
       color: var(--text);
       border-radius: 10px;
       height: var(--ctl-h);
@@ -219,17 +450,32 @@
       gap: 8px;
     }
 
-    button:hover { border-color: color-mix(in srgb, var(--accent) 60%, var(--border)); }
+    button:hover { border-color: var(--ui-hover-border); background: var(--ui-hover-bg); }
     button:active { transform: translateY(1px); }
 
+    button:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    .iconBtn:focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+
     .primary {
-      border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
-      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 42%, transparent), color-mix(in srgb, var(--accent2) 20%, transparent));
+      border-color: rgb(var(--accent-rgb) / 0.40);
+      background: var(--accent);
+      color: white;
+    }
+
+    .primary:hover {
+      border-color: rgb(var(--accent-rgb) / 0.55);
+      background: var(--accent-hi);
     }
 
     .danger {
-      border-color: color-mix(in srgb, var(--danger) 50%, var(--border));
-      color: color-mix(in srgb, var(--danger) 80%, var(--text));
+      border-color: rgb(var(--danger-rgb) / 0.35);
+      color: var(--danger);
+      background: rgb(var(--danger-rgb) / 0.06);
     }
 
     .hint {
@@ -237,6 +483,25 @@
       font-size: 12px;
       line-height: 1.4;
     }
+
+    .hintBlock {
+      padding: 0 14px 12px;
+    }
+
+    .hintRow {
+      margin-bottom: 6px;
+    }
+
+    .hintRow:last-child {
+      margin-bottom: 0;
+    }
+
+    .hintStrong {
+      color: var(--text);
+      font-weight: 650;
+    }
+
+    .hintMt { margin-top: 12px; }
 
     .row {
       display: grid;
@@ -252,7 +517,7 @@
       gap: 8px;
       align-items: center;
       border: 1px solid var(--border);
-      background: color-mix(in srgb, var(--panel) 84%, transparent);
+      background: var(--ui-surface-2);
       border-radius: 999px;
       padding: 8px 12px;
       font-size: 12px;
@@ -273,7 +538,7 @@
 
     select {
       border: 1px solid var(--border);
-      background: color-mix(in srgb, var(--panel) 88%, transparent);
+      background: var(--ui-surface-2);
       color: var(--text);
       border-radius: 10px;
       height: calc(var(--ctl-h) - 6px);
@@ -282,18 +547,24 @@
       outline: none;
     }
 
+
     dialog {
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: var(--radius);
       background: var(--panel);
       color: var(--text);
       width: min(900px, calc(100vw - 28px));
-      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
     }
 
     dialog::backdrop {
-      background: rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(4px);
+      background: rgba(16, 12, 8, 0.58);
+    }
+
+    @supports (backdrop-filter: blur(4px)) {
+      dialog::backdrop {
+        backdrop-filter: blur(4px);
+      }
     }
 
     .modalHead {
@@ -312,8 +583,34 @@
     }
 
     .modalBody code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      color: color-mix(in srgb, var(--accent2) 65%, var(--text));
+      font-family: var(--font-mono);
+      color: var(--accent2);
+    }
+
+    .modalTitle {
+      font-family: var(--font-serif);
+      font-weight: 750;
+      letter-spacing: -0.15px;
+    }
+
+    .modalSectionTitle {
+      color: var(--text);
+      font-weight: 750;
+      margin: 0 0 6px;
+    }
+
+    .modalSectionTitle--spaced { margin-top: 12px; }
+
+    .modalList {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .modalList--spaced { margin-bottom: 12px; }
+
+    .modalStrong {
+      color: var(--text);
+      font-weight: 650;
     }
 
     .twoCol {
@@ -327,8 +624,8 @@
     }
 
     .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      color: color-mix(in srgb, var(--accent2) 65%, var(--text));
+      font-family: var(--font-mono);
+      color: var(--accent2);
     }
 
     .status {
@@ -342,6 +639,10 @@
       font-weight: 600;
     }
 
+    .statusOverLimit {
+      color: var(--danger);
+    }
+
     .footer {
       max-width: 1280px;
       margin: 0 auto;
@@ -352,11 +653,12 @@
     }
 
     a { color: var(--accent); }
+    a:hover { text-decoration: none; }
   </style>
 </head>
 <body>
   <header>
-    <h1>MD → LinkedIn Unicode Formatter</h1>
+    <h1>Markdown → LinkedIn Unicode Formatter</h1>
     <p class="sub">
       Paste Markdown on the left. Get “LinkedIn-style” bold/italic/mono on the right using Unicode letter variants.
       This is plain text output (no HTML), so you can paste it into LinkedIn.
@@ -375,9 +677,9 @@
       <header><h2>Markdown input</h2></header>
       <div class="editorBar" aria-label="Editor toolbar">
         <div class="group" role="toolbar" aria-label="Formatting">
-          <button class="iconBtn" id="tbBold" type="button" title="Bold (wrap with **)"><span style="font-weight:800; font-size:15px; letter-spacing:0.2px;">B</span></button>
-          <button class="iconBtn" id="tbItalic" type="button" title="Italic (wrap with *)"><span style="font-style:italic; font-size:15px;">I</span></button>
-          <button class="iconBtn" id="tbStrike" type="button" title="Strikethrough (wrap with ~~)"><span style="text-decoration: line-through; font-size:15px;">S</span></button>
+          <button class="iconBtn" id="tbBold" type="button" title="Bold (wrap with **)"><span class="iconText iconText--bold">B</span></button>
+          <button class="iconBtn" id="tbItalic" type="button" title="Italic (wrap with *)"><span class="iconText iconText--italic">I</span></button>
+          <button class="iconBtn" id="tbStrike" type="button" title="Strikethrough (wrap with ~~)"><span class="iconText iconText--strike">S</span></button>
           <button class="iconBtn" id="tbLink" type="button" title="Link ([text](url))" aria-label="Insert link">
             <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 0 0-7.07-7.07L11 2.86"/><path d="M14 11a5 5 0 0 0-7.07 0L4.81 13.1a5 5 0 0 0 7.07 7.07L13 21.14"/></svg>
           </button>
@@ -409,10 +711,10 @@
         <div class="countBadge" id="mdCount" aria-label="Markdown character count"><strong>0</strong> characters</div>
       </div>
       <textarea id="md" spellcheck="false" placeholder="# Headline\n\nWrite **bold**, *italic*, ***both***, `code`, ~~strike~~.\n\n- Bullet 1\n- Bullet 2\n\n[My site](https://example.com)"></textarea>
-      <div class="hint" style="padding: 0 14px 12px;">
-        <div style="margin-bottom: 6px;"><strong style="color: var(--text);">Paste from Word / Google Docs:</strong> if your clipboard contains rich text, this tool will try to convert it into Markdown automatically.</div>
-        <div style="margin-bottom: 6px;"><strong style="color: var(--text);">Tables:</strong> pipe tables are converted to readable aligned text.</div>
-        <div><strong style="color: var(--text);">Code blocks:</strong> fenced blocks (<span class="mono">```</span>) are supported and rendered as monospace Unicode.</div>
+      <div class="hint hintBlock">
+        <div class="hintRow"><strong class="hintStrong">Paste from Word / Google Docs:</strong> if your clipboard contains rich text, this tool will try to convert it into Markdown automatically.</div>
+        <div class="hintRow"><strong class="hintStrong">Tables:</strong> pipe tables are converted to readable aligned text.</div>
+        <div><strong class="hintStrong">Code blocks:</strong> fenced blocks (<span class="mono">```</span>) are supported and rendered as monospace Unicode.</div>
       </div>
       <div class="toolbar">
         <div class="left">
@@ -474,7 +776,7 @@
   <dialog id="dlgGuide">
     <div class="modalHead">
       <div>
-        <div style="font-weight: 700;">Formatting guide</div>
+        <div class="modalTitle">Formatting guide</div>
         <div class="hint">Supported syntax, shortcuts, and accessibility notes.</div>
       </div>
       <button id="btnCloseGuide" type="button">Close</button>
@@ -482,8 +784,8 @@
     <div class="modalBody">
       <div class="twoCol">
         <div>
-          <div style="font-weight: 700; color: var(--text); margin-bottom: 6px;">Markdown → LinkedIn</div>
-          <ul style="margin: 0; padding-left: 18px;">
+          <div class="modalSectionTitle">Markdown → LinkedIn</div>
+          <ul class="modalList">
             <li><code>**bold**</code></li>
             <li><code>*italic*</code></li>
             <li><code>***bolditalic***</code></li>
@@ -497,14 +799,14 @@
           </ul>
         </div>
         <div>
-          <div style="font-weight: 700; color: var(--text); margin-bottom: 6px;">Shortcuts</div>
-          <ul style="margin: 0; padding-left: 18px;">
+          <div class="modalSectionTitle">Shortcuts</div>
+          <ul class="modalList">
             <li><code>Cmd/Ctrl + Enter</code>: Convert</li>
             <li><code>Cmd/Ctrl + Shift + C</code>: Copy output</li>
             <li><code>Esc</code>: Close this guide</li>
           </ul>
 
-          <div style="font-weight: 700; color: var(--text); margin: 12px 0 6px;">Accessibility note</div>
+          <div class="modalSectionTitle modalSectionTitle--spaced">Accessibility note</div>
           <div>
             Unicode “fake bold/italics” can confuse screen readers and may hurt searchability. Use sparingly for key highlights.
           </div>
@@ -516,41 +818,41 @@
   <dialog id="dlgPrivacy">
     <div class="modalHead">
       <div>
-        <div style="font-weight: 700;">Privacy</div>
+        <div class="modalTitle">Privacy</div>
         <div class="hint">What happens to your text when you use this page.</div>
       </div>
       <button id="btnClosePrivacy" type="button">Close</button>
     </div>
     <div class="modalBody">
-      <div style="color: var(--text); font-weight: 700; margin-bottom: 6px;">Short version</div>
-      <ul style="margin: 0 0 12px; padding-left: 18px;">
-        <li><strong style="color: var(--text);">No backend:</strong> your input is processed locally in your browser.</li>
-        <li><strong style="color: var(--text);">No storage:</strong> we do not store or send your text anywhere.</li>
-        <li><strong style="color: var(--text);">No tracking:</strong> this page does not include analytics, ads, or cookies.</li>
+      <div class="modalSectionTitle">Short version</div>
+      <ul class="modalList modalList--spaced">
+        <li><strong class="modalStrong">No backend:</strong> your input is processed locally in your browser.</li>
+        <li><strong class="modalStrong">No storage:</strong> we do not store or send your text anywhere.</li>
+        <li><strong class="modalStrong">No tracking:</strong> this page does not include analytics, ads, or cookies.</li>
       </ul>
 
-      <div style="color: var(--text); font-weight: 700; margin: 12px 0 6px;">Details</div>
-      <ul style="margin: 0; padding-left: 18px;">
+      <div class="modalSectionTitle modalSectionTitle--spaced">Details</div>
+      <ul class="modalList">
         <li>
-          <strong style="color: var(--text);">Processing:</strong> Conversion from Markdown-like syntax to LinkedIn-friendly Unicode happens entirely on your device.
+          <strong class="modalStrong">Processing:</strong> Conversion from Markdown-like syntax to LinkedIn-friendly Unicode happens entirely on your device.
         </li>
         <li>
-          <strong style="color: var(--text);">Clipboard:</strong> When you click “Copy”, the page writes the output text to your clipboard.
+          <strong class="modalStrong">Clipboard:</strong> When you click “Copy”, the page writes the output text to your clipboard.
           When you paste rich text from Word/Google Docs, the page may read the HTML content from your clipboard to convert it to Markdown.
           Clipboard access is handled by your browser and only occurs as part of your actions.
         </li>
         <li>
-          <strong style="color: var(--text);">Hosting:</strong> This site is hosted on <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a>.
+          <strong class="modalStrong">Hosting:</strong> This site is hosted on <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a>.
           GitHub may process standard request logs (for example IP address and user agent) when you load the page.
           See GitHub’s privacy documentation for details.
         </li>
         <li>
-          <strong style="color: var(--text);">Data you type:</strong> Your text stays in the page while it’s open.
+          <strong class="modalStrong">Data you type:</strong> Your text stays in the page while it’s open.
           If you refresh or close the tab, your input may be lost unless you copy it elsewhere.
         </li>
       </ul>
 
-      <div class="hint" style="margin-top: 12px;">
+      <div class="hint hintMt">
         This is informational and not legal advice.
       </div>
     </div>
@@ -913,7 +1215,7 @@
       parts.push(`Characters: <strong>${len}</strong> / ${LIMIT_POST}`);
 
       if (over) {
-        parts.push(`<span class="hint" style="color: color-mix(in srgb, var(--danger) 80%, var(--text));">• Over limit by ${len - LIMIT_POST}</span>`);
+        parts.push(`<span class="hint statusOverLimit">• Over limit by ${len - LIMIT_POST}</span>`);
       }
 
       setStatus(parts.join(' '));
