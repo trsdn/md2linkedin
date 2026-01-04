@@ -2,7 +2,7 @@
 
 Hey everyone — I’m excited to share a tiny tool I built:
 
-**MD → LinkedIn Unicode Formatter**
+**Markdown → LinkedIn Unicode Formatter**
 
 It lets you write in Markdown and paste into LinkedIn with:
 
@@ -23,6 +23,6 @@ So this uses the “Unicode trick” (mathematical letter variants) to *look* fo
 2. Paste this text into the left textarea
 3. Copy the output on the right and paste into LinkedIn
 
-[Project link](https://example.com)
+[Project link](https://trsdn.github.io/md2linkedin/)
 
 P.S. If you spot edge cases (nested emphasis, weird underscores), tell me — I’ll improve it.

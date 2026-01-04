@@ -2,6 +2,10 @@
 
 A tiny, single-page tool that converts Markdown-ish formatting into LinkedIn-ready **Unicode** “bold/italic/mono” text (the common LinkedIn formatting trick).
 
+Live site: <https://trsdn.github.io/md2linkedin/>
+Repo: <https://github.com/trsdn/md2linkedin>
+Report an issue: <https://github.com/trsdn/md2linkedin/issues/new>
+
 ## What it does
 
 Paste Markdown on the left, copy LinkedIn-ready text on the right.
@@ -17,12 +21,21 @@ Supported:
 - bullets like `- item` → `• item`
 - links like `[text](url)` → `text (url)`
 
+Also included:
+
+- Auto convert toggle
+- Bullet style selector
+- Toolbar buttons for common syntax + Undo/Redo
+- Copy, Select all, and Download `.txt`
+- Optional rich-text paste conversion (Word / Google Docs → Markdown-ish)
+- Privacy-first: runs entirely in your browser (no backend)
+
 ## Use
 
 Open `index.html` in your browser.
 
-Or use GitHub Pages (after the first deploy completes):
-`https://trsdn.github.io/md2linkedin/`
+Or use GitHub Pages:
+<https://trsdn.github.io/md2linkedin/>
 
 There’s also a `sample.txt` you can paste into the page to try everything quickly.
 
