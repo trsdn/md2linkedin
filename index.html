@@ -462,6 +462,11 @@
       If LinkedIn ever changes how it treats certain Unicode ranges, results may vary.
     </p>
     <p>
+      <a href="#" id="lnkPrivacy">Privacy</a>
+      <span aria-hidden="true">•</span>
+      <span class="hint">This tool runs entirely in your browser.</span>
+    </p>
+    <p>
       Built by <a href="https://www.linkedin.com/in/torstenmahr" target="_blank" rel="noopener noreferrer">Torsten Mahr</a>.
     </p>
   </div>
@@ -504,6 +509,49 @@
             Unicode “fake bold/italics” can confuse screen readers and may hurt searchability. Use sparingly for key highlights.
           </div>
         </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="dlgPrivacy">
+    <div class="modalHead">
+      <div>
+        <div style="font-weight: 700;">Privacy</div>
+        <div class="hint">What happens to your text when you use this page.</div>
+      </div>
+      <button id="btnClosePrivacy" type="button">Close</button>
+    </div>
+    <div class="modalBody">
+      <div style="color: var(--text); font-weight: 700; margin-bottom: 6px;">Short version</div>
+      <ul style="margin: 0 0 12px; padding-left: 18px;">
+        <li><strong style="color: var(--text);">No backend:</strong> your input is processed locally in your browser.</li>
+        <li><strong style="color: var(--text);">No storage:</strong> we do not store or send your text anywhere.</li>
+        <li><strong style="color: var(--text);">No tracking:</strong> this page does not include analytics, ads, or cookies.</li>
+      </ul>
+
+      <div style="color: var(--text); font-weight: 700; margin: 12px 0 6px;">Details</div>
+      <ul style="margin: 0; padding-left: 18px;">
+        <li>
+          <strong style="color: var(--text);">Processing:</strong> Conversion from Markdown-like syntax to LinkedIn-friendly Unicode happens entirely on your device.
+        </li>
+        <li>
+          <strong style="color: var(--text);">Clipboard:</strong> When you click “Copy”, the page writes the output text to your clipboard.
+          When you paste rich text from Word/Google Docs, the page may read the HTML content from your clipboard to convert it to Markdown.
+          Clipboard access is handled by your browser and only occurs as part of your actions.
+        </li>
+        <li>
+          <strong style="color: var(--text);">Hosting:</strong> This site is hosted on <a href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</a>.
+          GitHub may process standard request logs (for example IP address and user agent) when you load the page.
+          See GitHub’s privacy documentation for details.
+        </li>
+        <li>
+          <strong style="color: var(--text);">Data you type:</strong> Your text stays in the page while it’s open.
+          If you refresh or close the tab, your input may be lost unless you copy it elsewhere.
+        </li>
+      </ul>
+
+      <div class="hint" style="margin-top: 12px;">
+        This is informational and not legal advice.
       </div>
     </div>
   </dialog>
@@ -821,6 +869,9 @@
     const btnGuide = document.getElementById('btnGuide');
     const dlgGuide = document.getElementById('dlgGuide');
     const btnCloseGuide = document.getElementById('btnCloseGuide');
+    const dlgPrivacy = document.getElementById('dlgPrivacy');
+    const btnClosePrivacy = document.getElementById('btnClosePrivacy');
+    const lnkPrivacy = document.getElementById('lnkPrivacy');
     const bulletStyle = document.getElementById('bulletStyle');
 
     const tbBold = document.getElementById('tbBold');
@@ -1060,14 +1111,81 @@
       }
     }
 
-    function doUndoRedo(kind) {
-      elMd.focus();
+    // --- Undo/redo for textarea (reliable across browsers) ---
+    // We keep a simple history stack for the Markdown textarea. This powers the toolbar
+    // undo/redo buttons (and can coexist with the browser's native Cmd/Ctrl+Z).
+    const history = {
+      undo: [],
+      redo: [],
+      isRestoring: false,
+      isProgrammatic: false,
+      timer: null,
+    };
+
+    function snapshot(textarea) {
+      return {
+        value: textarea.value,
+        start: textarea.selectionStart ?? 0,
+        end: textarea.selectionEnd ?? 0,
+      };
+    }
+
+    function sameSnap(a, b) {
+      return !!a && !!b && a.value === b.value && a.start === b.start && a.end === b.end;
+    }
+
+    function recordHistory(textarea) {
+      const snap = snapshot(textarea);
+      const last = history.undo[history.undo.length - 1];
+      if (sameSnap(snap, last)) return;
+      history.undo.push(snap);
+      // Any new change invalidates redo history.
+      history.redo.length = 0;
+    }
+
+    function restoreHistory(textarea, snap) {
+      history.isRestoring = true;
       try {
-        // Deprecated but still widely supported for textarea undo/redo.
-        document.execCommand(kind);
-      } catch {
-        // No-op: browser doesn't allow programmatic undo/redo.
+        textarea.value = snap.value;
+        textarea.setSelectionRange(snap.start, snap.end);
+      } finally {
+        history.isRestoring = false;
       }
+      updateMdCount();
+      if (isAuto()) convertNow();
+    }
+
+    function scheduleRecordFromTyping() {
+      if (history.timer) window.clearTimeout(history.timer);
+      history.timer = window.setTimeout(() => {
+        history.timer = null;
+        recordHistory(elMd);
+      }, 350);
+    }
+
+    function withProgrammaticChange(fn) {
+      history.isProgrammatic = true;
+      try {
+        fn();
+      } finally {
+        history.isProgrammatic = false;
+      }
+      recordHistory(elMd);
+    }
+
+    function undoFromHistory() {
+      if (history.undo.length <= 1) return;
+      const current = history.undo.pop();
+      history.redo.push(current);
+      const prev = history.undo[history.undo.length - 1];
+      if (prev) restoreHistory(elMd, prev);
+    }
+
+    function redoFromHistory() {
+      const next = history.redo.pop();
+      if (!next) return;
+      history.undo.push(next);
+      restoreHistory(elMd, next);
     }
 
     function downloadOutput() {
@@ -1116,7 +1234,13 @@
       return !!toggleAuto?.checked;
     }
 
+    // Initialize history with the initial state.
+    recordHistory(elMd);
+
     elMd.addEventListener('input', () => {
+      if (!history.isRestoring && !history.isProgrammatic) {
+        scheduleRecordFromTyping();
+      }
       updateMdCount();
       if (isAuto()) convertNow();
     });
@@ -1124,70 +1248,68 @@
     // Toolbar actions
     tbBold?.addEventListener('click', () => {
       elMd.focus();
-      toggleRepeatedMarker(elMd, '*', 2, 'removeIfAtLeastUnit', 'bold');
+      withProgrammaticChange(() => toggleRepeatedMarker(elMd, '*', 2, 'removeIfAtLeastUnit', 'bold'));
       updateMdCount();
       if (isAuto()) convertNow();
     });
 
     tbItalic?.addEventListener('click', () => {
       elMd.focus();
-      toggleRepeatedMarker(elMd, '*', 1, 'toggleOdd', 'italic');
+      withProgrammaticChange(() => toggleRepeatedMarker(elMd, '*', 1, 'toggleOdd', 'italic'));
       updateMdCount();
       if (isAuto()) convertNow();
     });
 
     tbStrike?.addEventListener('click', () => {
       elMd.focus();
-      toggleRepeatedMarker(elMd, '~', 2, 'removeIfAtLeastUnit', 'strike');
+      withProgrammaticChange(() => toggleRepeatedMarker(elMd, '~', 2, 'removeIfAtLeastUnit', 'strike'));
       updateMdCount();
       if (isAuto()) convertNow();
     });
 
     tbLink?.addEventListener('click', () => {
       elMd.focus();
-      insertLinkAtSelection(elMd);
+      withProgrammaticChange(() => insertLinkAtSelection(elMd));
       updateMdCount();
       if (isAuto()) convertNow();
     });
 
     tbBullets?.addEventListener('click', () => {
       elMd.focus();
-      prefixLines(elMd, '- ', false);
+      withProgrammaticChange(() => prefixLines(elMd, '- ', false));
       updateMdCount();
       if (isAuto()) convertNow();
     });
 
     tbNumbered?.addEventListener('click', () => {
       elMd.focus();
-      prefixLines(elMd, '', true);
+      withProgrammaticChange(() => prefixLines(elMd, '', true));
       updateMdCount();
       if (isAuto()) convertNow();
     });
 
     tbQuote?.addEventListener('click', () => {
       elMd.focus();
-      prefixLines(elMd, '> ', false);
+      withProgrammaticChange(() => prefixLines(elMd, '> ', false));
       updateMdCount();
       if (isAuto()) convertNow();
     });
 
     tbCode?.addEventListener('click', () => {
       elMd.focus();
-      insertCode(elMd);
+      withProgrammaticChange(() => insertCode(elMd));
       updateMdCount();
       if (isAuto()) convertNow();
     });
 
     tbUndo?.addEventListener('click', () => {
-      doUndoRedo('undo');
-      updateMdCount();
-      if (isAuto()) convertNow();
+      elMd.focus();
+      undoFromHistory();
     });
 
     tbRedo?.addEventListener('click', () => {
-      doUndoRedo('redo');
-      updateMdCount();
-      if (isAuto()) convertNow();
+      elMd.focus();
+      redoFromHistory();
     });
 
     function insertAtCursor(textarea, text) {
@@ -1322,7 +1444,7 @@
       }
 
       e.preventDefault();
-      insertAtCursor(elMd, md);
+      withProgrammaticChange(() => insertAtCursor(elMd, md));
       if (isAuto()) convertNow();
       setStatus('Pasted rich text → converted to Markdown.');
     });
@@ -1362,6 +1484,13 @@
 
     btnCloseGuide.addEventListener('click', () => dlgGuide?.close());
 
+    lnkPrivacy?.addEventListener('click', (e) => {
+      e.preventDefault();
+      dlgPrivacy?.showModal();
+    });
+
+    btnClosePrivacy?.addEventListener('click', () => dlgPrivacy?.close());
+
     dlgGuide.addEventListener('cancel', (e) => {
       // Keep default Esc-to-close behavior, but we can add custom logic later.
     });
@@ -1371,6 +1500,11 @@
 
       if (e.key === 'Escape' && dlgGuide?.open) {
         dlgGuide.close();
+        return;
+      }
+
+      if (e.key === 'Escape' && dlgPrivacy?.open) {
+        dlgPrivacy.close();
         return;
       }
 
@@ -1389,7 +1523,7 @@
     });
 
     btnClear.addEventListener('click', () => {
-      elMd.value = '';
+      withProgrammaticChange(() => { elMd.value = ''; elMd.setSelectionRange(0, 0); });
       convertNow();
       updateMdCount();
       elMd.focus();
@@ -1397,7 +1531,7 @@
     });
 
     btnExample.addEventListener('click', () => {
-      elMd.value = EXAMPLE;
+      withProgrammaticChange(() => { elMd.value = EXAMPLE; elMd.setSelectionRange(0, 0); });
       convertNow();
       updateMdCount();
       elMd.focus();
