@@ -744,7 +744,7 @@
         </div>
         <div class="countBadge" id="mdCount" aria-label="Markdown character count"><strong>0</strong> characters</div>
       </div>
-      <textarea id="md" spellcheck="false" placeholder="# Headline\n\nWrite **bold**, *italic*, ***both***, `code`, ~~strike~~.\n\n- Bullet 1\n- Bullet 2\n\n[My site](https://example.com)"></textarea>
+      <textarea id="md" spellcheck="false" autofocus placeholder="# Headline\n\nWrite **bold**, *italic*, ***both***, `code`, ~~strike~~.\n\n- Bullet 1\n- Bullet 2\n\n[My site](https://example.com)"></textarea>
       <div class="hint hintBlock">
         <div class="hintRow"><strong class="hintStrong">Paste from Word / Google Docs:</strong> if your clipboard contains rich text, this tool will try to convert it into Markdown automatically.</div>
         <div class="hintRow"><strong class="hintStrong">Tables:</strong> pipe tables are converted to readable aligned text.</div>
@@ -1881,6 +1881,16 @@
     // Initial conversion
     convertNow();
     updateMdCount();
+
+    // Make the editor ready for typing right away (helps when the page loads without focus).
+    // Some browsers may ignore autofocus; this is a safe fallback.
+    if (document.activeElement === document.body) {
+      try {
+        elMd.focus({ preventScroll: true });
+      } catch {
+        elMd.focus();
+      }
+    }
   </script>
 </body>
 </html>
