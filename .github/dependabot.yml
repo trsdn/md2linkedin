@@ -1,0 +1,15 @@
+version: 2
+
+# This repository is a static single-file site with no package manifest, so
+# GitHub Actions is the only active dependency ecosystem. If a package manifest
+# is ever added, add its ecosystem here with the directory it actually lives in.
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
