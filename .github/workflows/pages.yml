@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # No build step needed: this repo is a static single-file app.
       # Prepare a minimal publish directory so we don't upload the entire repo.
