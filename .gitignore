@@ -4,6 +4,14 @@
 .vscode/
 .idea/
 
+# Dependencies
+node_modules/
+
+# Test output
+test-results/
+playwright-report/
+blob-report/
+
 # Logs
 *.log
 

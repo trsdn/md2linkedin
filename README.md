@@ -41,28 +41,34 @@ Tip: click “Insert example” on the page to paste a ready-to-go sample post.
 
 ## Validate
 
-From a clean checkout, with [Node.js](https://nodejs.org/) 20 or newer:
+Two suites, both run in CI on every pull request.
+
+The unit suite needs no dependencies at all — from a clean checkout, with
+[Node.js](https://nodejs.org/) 20 or newer:
 
 ```sh
 node --test
 ```
 
-There is no install step and no dependencies: the suite uses only Node's built-in
-test runner, and reads the conversion engine straight out of `index.html`.
+It reads the conversion engine straight out of `index.html` and covers the
+Markdown → Unicode logic, including failure paths: unclosed markers, empty input,
+emoji and non-Latin passthrough, and code spans that must stay literal. It also
+checks that the app script parses, the structured data is valid JSON-LD, and the
+canonical URL agrees across `index.html`, `sitemap.xml` and `robots.txt`.
 
-It covers:
+The end-to-end suite drives the real page in Chromium and covers the UI layer:
+live conversion while typing, toolbar buttons and selection handling, undo/redo,
+the bullet style selector, clipboard, download, and the dialogs.
 
-- The Markdown → Unicode conversion engine, including failure paths — unclosed
-  markers, empty input, emoji and non-Latin passthrough, and code spans that must
-  stay literal.
-- Structural checks on the published site — the app script parses, the structured
-  data is valid JSON-LD, and the canonical URL agrees across `index.html`,
-  `sitemap.xml` and `robots.txt`.
+```sh
+npm ci
+npx playwright install --with-deps chromium
+npm test        # unit + end-to-end
+```
 
-It does not cover the UI wiring layer (toolbar, undo/redo, clipboard, download) or
-cross-browser rendering; both need a real browser.
+Individually: `npm run test:unit` and `npm run test:e2e`.
 
-The same command runs in CI on every pull request and on every push to `main`.
+Chromium is the only browser exercised; there is no cross-browser matrix.
 
 ## Notes / caveats
 
@@ -74,9 +80,9 @@ The same command runs in CI on every pull request and on every push to `main`.
 
 Maintainer and triage owner: [@trsdn](https://github.com/trsdn).
 
-- **Dependency updates.** Dependabot checks GitHub Actions weekly and opens pull
-  requests. @trsdn reviews them; they merge only once CI is green. GitHub Actions
-  is the only ecosystem configured, because the site ships no package manifest.
+- **Dependency updates.** Dependabot checks npm and GitHub Actions weekly and opens
+  pull requests. @trsdn reviews them; they merge only once CI is green. The npm
+  dependencies are test-only — the published site ships no runtime dependencies.
 - **Vulnerability alerts.** Dependabot alerts are enabled. @trsdn triages them and
   leaves no critical alert unresolved.
 
