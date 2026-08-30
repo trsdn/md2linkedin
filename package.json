@@ -1,0 +1,23 @@
+{
+  "name": "md2linkedin",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Convert Markdown into LinkedIn-ready Unicode text.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trsdn/md2linkedin.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "node --test",
+    "test:e2e": "playwright test",
+    "serve": "node tests/helpers/serve.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
+  }
+}

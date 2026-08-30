@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: "pages"
@@ -15,6 +15,11 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    # Scoped here rather than at workflow level: only this job needs write access,
+    # and only because actions-gh-pages pushes the built site to the gh-pages branch.
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
